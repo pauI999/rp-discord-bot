@@ -1665,7 +1665,7 @@ client.on("message", async (message) => {
     }
   }
   // Help Command
-  else if (command === "help") {
+  if (command === "help") {
     if (isLeaderschaft(message) || isFamilienrat(message)) {
       message
         .reply(
