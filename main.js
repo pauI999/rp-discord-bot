@@ -1667,95 +1667,102 @@ client.on("message", async (message) => {
   // Help Command
   if (command === "help") {
     if (isLeaderschaft(message) || isFamilienrat(message)) {
-      message
-        .reply(
-          `Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:` +
-            config.anwesenheitchannel !=
-            "0"
-            ? '\n - "' +
-                config.prefix +
-                'on <Zeit>" um dich online zu stellen' +
-                '\n - "' +
-                config.prefix +
-                'off <Zeit>" um dich offline zu stellen' +
-                '\n - "' +
-                config.prefix +
-                'aon (ID | @User) <Zeit>" um einen anderen User online zu stellen' +
-                '\n - "' +
-                config.prefix +
-                'aoff (ID | @User) <Zeit>" um einen anderen User offline zu stellen' +
-                '\n - "' +
-                config.prefix +
-                'acheck (ID | @User) <Tage>" um die Aktivität der letzten ' +
-                config.activitycheckdaysdefault +
-                " Tage bzw. angegeben Tage zu bekommen"
-            : "" + config.routechannel != "0"
-            ? '\n - "' +
-              config.prefix +
-              'add (ID | @User) (Menge)" um eine Abgabe hinzuzufügen' +
-              '\n - "' +
-              config.prefix +
-              'sum" um die letzten Abgaben zusammenzufassen'
-            : "" + config.abgabenchannel != "0"
-            ? '\n - "' +
-              config.prefix +
-              'abgaben (ID | @User) <KW>" um die Abgaben für ein Mitglied für eine Woche zu ändern' +
-              '\n - "' +
-              config.prefix +
-              'abgabenmessage" um die Abgabennachricht für die Woche zu schicken' +
-              '\n - "' +
-              config.prefix +
-              'cleanabgaben (KW)" um die Abgabennachricht für angegebene Woche zu "bereinigen"'
-            : "" + config.waffenchannel != "0"
-            ? '\n - "' +
-              config.prefix +
-              'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
-              "\nEs gibt nur folgende Waffen: " +
-              config.waffenstring +
-              '\n - "' +
-              config.prefix +
-              'wdelete" um die letzte Waffenbestellung zu löschen' +
-              '\n - "' +
-              config.prefix +
-              'wsum" um die Waffenbestellung zusammenzufassen'
-            : "" +
-              '\n - "' +
-              config.prefix +
-              'help" um diese Nachricht zu bekommen'
-        )
-        .then((msg) => {
-          msg.react("🗑️");
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
+      msg = "Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:";
+      if (config.anwesenheitchannel !== "0") {
+        msg =
+          msg +
+          '\n - "' +
+          config.prefix +
+          'on <Zeit>" um dich online zu stellen' +
+          '\n - "' +
+          config.prefix +
+          'off <Zeit>" um dich offline zu stellen' +
+          '\n - "' +
+          config.prefix +
+          'aon (ID | @User) <Zeit>" um einen anderen User online zu stellen' +
+          '\n - "' +
+          config.prefix +
+          'aoff (ID | @User) <Zeit>" um einen anderen User offline zu stellen' +
+          '\n - "' +
+          config.prefix +
+          'acheck (ID | @User) <Tage>" um die Aktivität der letzten ' +
+          config.activitycheckdaysdefault +
+          " Tage bzw. angegeben Tage zu bekommen";
+      }
+      if (config.routechannel !== "0") {
+        msg =
+          msg +
+          '\n - "' +
+          config.prefix +
+          'add (ID | @User) (Menge)" um eine Abgabe hinzuzufügen' +
+          '\n - "' +
+          config.prefix +
+          'sum" um die letzten Abgaben zusammenzufassen';
+      }
+      if (config.abgabenchannel !== "0") {
+        msg =
+          msg +
+          '\n - "' +
+          config.prefix +
+          'abgaben (ID | @User) <KW>" um die Abgaben für ein Mitglied für eine Woche zu ändern' +
+          '\n - "' +
+          config.prefix +
+          'abgabenmessage" um die Abgabennachricht für die Woche zu schicken' +
+          '\n - "' +
+          config.prefix +
+          'cleanabgaben (KW)" um die Abgabennachricht für angegebene Woche zu "bereinigen"';
+      }
+      if (config.waffenchannel !== "0") {
+        msg =
+          msg +
+          '\n - "' +
+          config.prefix +
+          'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
+          "\nEs gibt nur folgende Waffen: " +
+          config.waffenstring +
+          '\n - "' +
+          config.prefix +
+          'wdelete" um die letzte Waffenbestellung zu löschen' +
+          '\n - "' +
+          config.prefix +
+          'wsum" um die Waffenbestellung zusammenzufassen';
+      }
+      msg =
+        msg + '\n - "' + config.prefix + 'help" um diese Nachricht zu bekommen';
+      message.reply(msg).then((msg) => {
+        msg.react("🗑️");
+        message.delete({ timeout: config.timeout }).catch((error) => {});
+      });
     } else {
-      message
-        .reply(
-          `Hilfe [**<> → Optionale Angabe**]:` + config.anwesenheitchannel !==
-            "0"
-            ? '\n - "' +
-                config.prefix +
-                'on <Zeit>" um dich online zu stellen' +
-                '\n - "' +
-                config.prefix +
-                'off <Zeit>" um dich offline zu stellen'
-            : "" + config.waffenchannel != "0"
-            ? '\n - "' +
-              config.prefix +
-              'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
-              "\nEs gibt nur folgende Waffen: " +
-              config.waffenstring +
-              '\n - "' +
-              config.prefix +
-              'wdelete" um die letzte Waffenbestellung zu löschen'
-            : "" +
-              '\n - "' +
-              config.prefix +
-              'help" um diese Nachricht zu bekommen'
-        )
-        .then((msg) => {
-          msg.react("🗑️");
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
+      msg = "Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:";
+      if (config.anwesenheitchannel !== "0") {
+        msg =
+          msg +
+          '\n - "' +
+          config.prefix +
+          'on <Zeit>" um dich online zu stellen' +
+          '\n - "' +
+          config.prefix +
+          'off <Zeit>" um dich offline zu stellen';
+      }
+      if (config.waffenchannel !== "0") {
+        msg =
+          msg +
+          '\n - "' +
+          config.prefix +
+          'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
+          "\nEs gibt nur folgende Waffen: " +
+          config.waffenstring +
+          '\n - "' +
+          config.prefix +
+          'wdelete" um die letzte Waffenbestellung zu löschen';
+      }
+      msg =
+        msg + '\n - "' + config.prefix + 'help" um diese Nachricht zu bekommen';
+      message.reply(msg).then((msg) => {
+        msg.react("🗑️");
+        message.delete({ timeout: config.timeout }).catch((error) => {});
+      });
     }
   }
 });
