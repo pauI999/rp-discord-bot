@@ -1916,4 +1916,4 @@ client.on("messageReactionAdd", async (reaction, user) => {
   }
 });
 
-client.login("OTAxODAzMTU3MzEzNjk5ODQy.YXVLow.grNxBCyKS6Yv1o9RswZojLOAoco");
+client.login(config.token);
