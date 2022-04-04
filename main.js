@@ -59,14 +59,6 @@ function isFamilienrat(message) {
 }
 
 // Rollen Check
-function isUGLeitung(message) {
-  if (message.member.roles.cache.some((role) => role.id === config.ugleitung)) {
-    return true;
-  }
-  return false;
-}
-
-// Rollen Check
 function isLeaderschaft2(user) {
   if (user.roles.cache.some((role) => role.id === config.leaderschaft)) {
     return true;
@@ -85,7 +77,7 @@ function isFamilienrat2(user) {
 // Funktion für den Log Channel
 function logEmbed(member, title, description) {
   const embed = new Discord.MessageEmbed()
-    .setColor("#ac7900")
+    .setColor(config.colorhex)
     .setDescription(title)
     .setAuthor(
       `${member.user.username}#${member.user.discriminator}`,
@@ -122,7 +114,7 @@ function cleanAbgaben(message, kw) {
           let guildMember = message.guild.members.cache.get(memberID);
           if (guildMember) {
             if (
-              guildMember.roles.cache.some((role) => role.id === config.madrazo)
+              guildMember.roles.cache.some((role) => role.id === config.famile)
             ) {
               if (
                 !guildMember.roles.cache.some(
@@ -147,52 +139,6 @@ function cleanAbgaben(message, kw) {
         })
         .catch((error) => {
           console.error(error);
-        });
-    }
-    message.delete({ timeout: config.timeout }).catch((error) => {});
-  });
-}
-
-// Clean UG-Abgabenliste Funktion
-function cleanAbgabenUG(message, kw) {
-  let channel = message.guild.channels.cache.get(config.abgabenchannelUG);
-  let done = false;
-  channel.messages.fetch({ limit: 20 }).then((messages) => {
-    messages.each((smessage) => {
-      if (smessage.content.includes(`**${kw}**`)) {
-        done = true;
-        let teile = smessage.content.split("\n");
-        let teileneu = [];
-        teileneu.push(teile[0]);
-        teile.shift();
-        teile.forEach((teil) => {
-          var memberID = teil
-            .split(" ")[2]
-            .replace("<", "")
-            .replace("@", "")
-            .replace("!", "")
-            .replace(">", "");
-          let guildMember = message.guild.members.cache.get(memberID);
-          if (guildMember) {
-            if (
-              guildMember.roles.cache.some(
-                (role) => role.id === config.madrazoUG
-              )
-            ) {
-              teileneu.push(teil);
-            }
-          }
-        });
-        smessage.edit(teileneu.join("\n"));
-      }
-    });
-    if (!done) {
-      message
-        .reply(
-          "Fehler: Die Nachricht für diese Kalenderwoche fehlt noch, oder liegt zu weit in der Vergangenheit!"
-        )
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
         });
     }
     message.delete({ timeout: config.timeout }).catch((error) => {});
@@ -264,71 +210,6 @@ function toggleAbgaben(message, user, kw) {
   });
 }
 
-// UG-Abgabenstatus ändern Funktion
-function toggleAbgabenUG(message, user, kw) {
-  let channel = message.guild.channels.cache.get(config.abgabenchannelUG);
-  let kassechannel = message.guild.channels.cache.get(config.kassechannel);
-  let done = false;
-  channel.messages.fetch({ limit: 6 }).then((messages) => {
-    messages.each((smessage) => {
-      if (smessage.content.includes(`**${kw}**`)) {
-        if (smessage.content.includes(user.id)) {
-          done = true;
-          let teile = smessage.content.split("\n");
-          let teileneu = [];
-          teile.forEach((teil) => {
-            if (teil.includes(user.id)) {
-              if (teil.includes(":x:")) {
-                teil = ` - <@${user.id}> - :white_check_mark:`;
-                kassechannel.send(
-                  `> + ${config.abgabenstringUG} UG-Abgaben ${kw} - <@${user.id}>`
-                );
-                logEmbed(
-                  message.member,
-                  `UG-Abgaben ${kw} von <@${user.id}> entgegengenommen`,
-                  `+ ${config.abgabenstringUG}`
-                );
-              } else {
-                teil = ` - <@${user.id}> - :x:`;
-                kassechannel.send(
-                  `> - ${config.abgabenstringUG} UG-Abgaben ${kw} - <@${user.id}>`
-                );
-                logEmbed(
-                  message.member,
-                  `UG-Abgaben ${kw} an <@${user.id}> zurückgegeben`,
-                  `- ${config.abgabenstringUG}`
-                );
-              }
-              teileneu.push(teil);
-            } else {
-              teileneu.push(teil);
-            }
-          });
-          smessage.edit(teileneu.join("\n"));
-        } else {
-          message
-            .reply(
-              "Fehler: Das Mitglied muss diese Woche noch keine Abgaben zahlen!"
-            )
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-            });
-        }
-      }
-    });
-    if (!done) {
-      message
-        .reply(
-          "Fehler: Die Nachricht für diese Kalenderwoche fehlt noch, oder liegt zu weit in der Vergangenheit!"
-        )
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-    }
-    message.delete({ timeout: config.timeout }).catch((error) => {});
-  });
-}
-
 // Abgaben Message Funktion
 function sendAbgabenMessage(message, channel) {
   var string = [];
@@ -346,7 +227,7 @@ function sendAbgabenMessage(message, channel) {
       return 0;
     })
     .each((member) => {
-      if (member.roles.cache.some((role) => role.id === config.madrazo)) {
+      if (member.roles.cache.some((role) => role.id === config.familie)) {
         if (
           !member.roles.cache.some((role) => role.id === config.leaderschaft)
         ) {
@@ -354,20 +235,6 @@ function sendAbgabenMessage(message, channel) {
         }
       }
     });
-  channel.send(string.join(""));
-}
-
-// Abgaben Message Funktion
-function sendAbgabenMessageUG(message, channel) {
-  var string = [];
-  string.push(
-    `Abgaben (${config.abgabenstringUG}) - KW **${getWeekNumber(new Date())}**`
-  );
-  message.guild.members.cache.each((member) => {
-    if (member.roles.cache.some((role) => role.id === config.madrazoUG)) {
-      string.push(`\n - ${member} - :x:`);
-    }
-  });
   channel.send(string.join(""));
 }
 
@@ -635,22 +502,25 @@ function activityOff(message, user, type, time) {
 }
 
 client.on("ready", async () => {
-  console.log("Madrazo Bot ist online!");
+  console.log(config.startmessage);
   console.log("----");
 
-  client.user.setActivity("-mhelp");
+  client.user.setActivity(config.prefix + "help");
 });
 
 client.on("message", async (message) => {
   if (message.author.bot) return;
-  // !a ic Command
-  if (message.channel.id === config.bildchannel) {
-    if (message.attachments.size === 0) {
-      if (!message.content.toLowerCase().includes("https://")) {
-        message.delete().catch((error) => {});
+  // Bilder-Channel Delete
+  if (config.bildchannel !== "0") {
+    if (message.channel.id === config.bildchannel) {
+      if (message.attachments.size === 0) {
+        if (!message.content.toLowerCase().includes("https://")) {
+          message.delete().catch((error) => {});
+        }
       }
     }
   }
+  // !a ic Command
   if (message.content.startsWith("!a")) {
     const args = message.content.slice(3).split(/ +/);
     const command = args[0].toLowerCase();
@@ -658,62 +528,85 @@ client.on("message", async (message) => {
       message.channel.send("Find‘s ic heraus! :slight_smile:");
     }
   }
-  if (!message.content.startsWith("-m")) return;
-  const args = message.content.slice(2).split(/ +/);
+  if (!message.content.startsWith(config.prefix)) return;
+  const args = message.content.slice(config.prefix.length).split(/ +/);
   const command = args.shift().toLowerCase();
 
-  // Waffenbestellung hinzufügen Command
-  if (command === "waffen") {
-    if (message.channel.id == config.waffenchannel) {
-      if (args.length >= 2) {
-        if (args.length % 2 === 0) {
-          let weapons = new Map();
-          let waffen = new Map(Object.entries(config.waffen));
-          let error = false;
-          for (let i = 0; i < args.length; i = i + 2) {
-            if (waffen.has(args[i].toLocaleLowerCase())) {
-              if (isNumeric(args[i + 1])) {
-                weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
+  // Waffenbestellung
+  if (config.waffenchannel !== "0") {
+    // Waffenbestellung hinzufügen Command
+    if (command === "waffen") {
+      if (message.channel.id == config.waffenchannel) {
+        if (args.length >= 2) {
+          if (args.length % 2 === 0) {
+            let weapons = new Map();
+            let waffen = new Map(Object.entries(config.waffen));
+            let error = false;
+            for (let i = 0; i < args.length; i = i + 2) {
+              if (waffen.has(args[i].toLocaleLowerCase())) {
+                if (isNumeric(args[i + 1])) {
+                  weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
+                } else {
+                  error = true;
+                  message
+                    .reply(
+                      'Syntax: "' +
+                        config.prefix +
+                        'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!'
+                    )
+                    .then((msg) => {
+                      msg
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                      message
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                    });
+                  break;
+                }
               } else {
                 error = true;
                 message
                   .reply(
-                    'Syntax: "-mwaffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!'
+                    'Syntax: "' +
+                      config.prefix +
+                      'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!\nEs gibt nur folgende Waffen: ' +
+                      config.waffenstring
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    msg.delete({ timeout: 10000 }).catch((error) => {});
                     message
                       .delete({ timeout: config.timeout })
                       .catch((error) => {});
                   });
                 break;
               }
-            } else {
-              error = true;
-              message
-                .reply(
-                  'Syntax: "-mwaffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!\nEs gibt nur folgende Waffen: ' +
-                    config.waffenstring
-                )
+            }
+            if (!error) {
+              let string = `Name: ${message.author}\nWaffen:\n`;
+              weapons.forEach((element, index) => {
+                string = `${string}${element}x ${index}\n`;
+              });
+              message.channel
+                .send(string)
                 .then((msg) => {
-                  msg.delete({ timeout: 10000 }).catch((error) => {});
                   message
                     .delete({ timeout: config.timeout })
                     .catch((error) => {});
+                })
+                .catch((error) => {
+                  console.error(error);
                 });
-              break;
             }
-          }
-          if (!error) {
-            let string = `Name: ${message.author}\nWaffen:\n`;
-            weapons.forEach((element, index) => {
-              string = `${string}${element}x ${index}\n`;
-            });
-            message.channel
-              .send(string)
+          } else {
+            message
+              .reply(
+                'Syntax: "' +
+                  config.prefix +
+                  'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!'
+              )
               .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
                 message
                   .delete({ timeout: config.timeout })
                   .catch((error) => {});
@@ -725,118 +618,13 @@ client.on("message", async (message) => {
         } else {
           message
             .reply(
-              'Syntax: "-mwaffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!'
+              'Syntax: "' +
+                config.prefix +
+                'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!'
             )
             .then((msg) => {
               msg.delete({ timeout: config.timeout }).catch((error) => {});
               message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else {
-        message
-          .reply(
-            'Syntax: "-mwaffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!'
-          )
-          .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
-          });
-      }
-    } else {
-      message
-        .reply(`Fehler: Nur im <#${config.waffenchannel}> Channel möglich!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // Verkauf Zusammenfassen Command
-  else if (command === "wsum") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
-      if (message.channel.id == config.waffenchannel) {
-        if (args.length === 0) {
-          let cut = false;
-          let weapons = new Map();
-          message.channel.messages.fetch().then((messages) => {
-            messages.each(async (message) => {
-              if (cut === false) {
-                if (message.partial) await message.fetch();
-                if (message.content.includes("**Insgesamt:**")) {
-                  cut = true;
-                } else if (
-                  message.author.bot &&
-                  message.content.includes("Waffen:")
-                ) {
-                  let messagestring = message.content.split("\n");
-                  messagestring.shift();
-                  messagestring.shift();
-                  let weaponsmessage = new Map();
-                  messagestring.forEach((part) => {
-                    let parts = part.split(" ");
-                    weaponsmessage.set(parts[1], parts[0].slice(0, -1));
-                  });
-                  weaponsmessage.forEach((element, index) => {
-                    if (weapons.has(index)) {
-                      weapons.set(
-                        index,
-                        parseInt(weapons.get(index)) + parseInt(element)
-                      );
-                    } else {
-                      weapons.set(index, parseInt(element));
-                    }
-                  });
-                }
-              }
-            });
-            let preis = 0;
-            let langwaffen = 0;
-            let waffen = new Map(Object.entries(config.waffen));
-            let messagestring = `**Insgesamt:**\n\n`;
-            weapons.forEach((element, index) => {
-              if (
-                index == "adw" ||
-                index == "spezi" ||
-                index == "kompakt" ||
-                index == "gusenberg" ||
-                index == "ak"
-              ) {
-                langwaffen = langwaffen + element;
-              }
-              messagestring = `${messagestring}> ${index}: ${element}\n`;
-              preis = preis + element * waffen.get(index);
-            });
-
-            messagestring = `${messagestring}\nPreis: **${addDots(preis)}$**`;
-            messagestring = `${messagestring}\nLangwaffen: **${addDots(
-              langwaffen
-            )}**`;
-            message.channel
-              .send(messagestring)
-              .then(() => {
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          });
-        } else {
-          message
-            .reply('Syntax: "-mwsum"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
             });
         }
       } else {
@@ -845,850 +633,253 @@ client.on("message", async (message) => {
           .then((msg) => {
             msg.delete({ timeout: config.timeout }).catch((error) => {});
             message.delete({ timeout: config.timeout }).catch((error) => {});
-          });
-      }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // Online stellen Command
-  else if (command === "on") {
-    if (message.channel.id == config.anwesenheitchannel) {
-      if (args.length === 0) {
-        activityOn(message, message.author, 1);
-      } else if (args.length === 1) {
-        if (args[0].match(pattern)) {
-          activityOn(message, message.author, 1, args[0]);
-        } else {
-          message
-            .reply('Syntax: "-mon <Zeit>"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else {
-        message.reply('Syntax: "-mon <Zeit>"!').then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-      }
-    } else {
-      message
-        .reply(
-          `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
-        )
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // Offline stellen Command
-  else if (command === "off") {
-    if (message.channel.id == config.anwesenheitchannel) {
-      if (args.length === 0) {
-        activityOff(message, message.author, 1);
-      } else if (args.length === 1) {
-        if (args[0].match(pattern)) {
-          activityOff(message, message.author, 1, args[0]);
-        } else {
-          message
-            .reply('Syntax: "-moff <Zeit>"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else {
-        message.reply('Syntax: "-moff <Zeit>"!').then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-      }
-    } else {
-      message
-        .reply(
-          `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
-        )
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // Andere User Online stellen Command
-  else if (command === "aon") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
-      if (message.channel.id == config.anwesenheitchannel) {
-        if (args.length === 1) {
-          if (isNumeric(args[0])) {
-            await client.users
-              .fetch(args[0])
-              .then((user) => {
-                activityOn(message, user, 2);
-              })
-              .catch(() => {
-                message.channel
-                  .send('Syntax: "-maon (ID | @User) <Zeit>"!')
-                  .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                  });
-              });
-          } else {
-            const user = message.mentions.users.first();
-            if (user === undefined) {
-              message
-                .reply('Syntax: "-maon (ID | @User) <Zeit>"!')
-                .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                });
-            } else {
-              activityOn(message, user, 2);
-            }
-          }
-        } else if (args.length === 2) {
-          if (args[1].match(pattern)) {
-            if (isNumeric(args[0])) {
-              await client.users
-                .fetch(args[0])
-                .then((user) => {
-                  activityOn(message, user, 2, args[1]);
-                })
-                .catch(() => {
-                  message.channel
-                    .send('Syntax: "-maon (ID | @User) <Zeit>"!')
-                    .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                    });
-                });
-            } else {
-              const user = message.mentions.users.first();
-              if (user === undefined) {
-                message
-                  .reply('Syntax: "-maon (ID | @User) <Zeit>"!')
-                  .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                  });
-              } else {
-                activityOn(message, user, 2, args[1]);
-              }
-            }
-          } else {
-            message
-              .reply('Syntax: "-maon (ID | @User) <Zeit>"!')
-              .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          }
-        } else {
-          message
-            .reply('Syntax: "-maon (ID | @User) <Zeit>"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else {
-        message
-          .reply(
-            `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
-          )
-          .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
-          });
-      }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // Andere User Offline stellen Command
-  else if (command === "aoff") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
-      if (message.channel.id == config.anwesenheitchannel) {
-        if (args.length === 1) {
-          if (isNumeric(args[0])) {
-            await client.users
-              .fetch(args[0])
-              .then((user) => {
-                activityOff(message, user, 2);
-              })
-              .catch(() => {
-                message.channel
-                  .send('Syntax: "-maoff (ID | @User) <Zeit>"!')
-                  .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                  });
-              });
-          } else {
-            const user = message.mentions.users.first();
-            if (user === undefined) {
-              message
-                .reply('Syntax: "-maoff (ID | @User) <Zeit>"!')
-                .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                });
-            } else {
-              activityOff(message, user, 2);
-            }
-          }
-        } else if (args.length === 2) {
-          if (args[1].match(pattern)) {
-            if (isNumeric(args[0])) {
-              await client.users
-                .fetch(args[0])
-                .then((user) => {
-                  activityOff(message, user, 2, args[1]);
-                })
-                .catch(() => {
-                  message.channel
-                    .send('Syntax: "-maoff (ID | @User) <Zeit>"!')
-                    .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                    });
-                });
-            } else {
-              const user = message.mentions.users.first();
-              if (user === undefined) {
-                message
-                  .reply('Syntax: "-maoff (ID | @User) <Zeit>"!')
-                  .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                  });
-              } else {
-                activityOff(message, user, 2, args[1]);
-              }
-            }
-          } else {
-            message
-              .reply('Syntax: "-maoff (ID | @User) <Zeit>"!')
-              .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          }
-        } else {
-          message
-            .reply('Syntax: "-maon (ID | @User) <Zeit>"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else {
-        message
-          .reply(
-            `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
-          )
-          .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
-          });
-      }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // Aktivität Zusammenfassen Command
-  else if (command === "acheck") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
-      if (args.length === 1) {
-        if (isNumeric(args[0])) {
-          await client.users
-            .fetch(args[0])
-            .then((user) => {
-              getActivity(message, user);
-            })
-            .catch(() => {
-              message.channel
-                .send('Syntax: "-macheck (ID | @User) <Tage>"!')
-                .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                });
-            });
-        } else {
-          const user = message.mentions.users.first();
-          if (user === undefined) {
-            message
-              .send('Syntax: "-macheck (ID | @User) <Tage>"!')
-              .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          } else {
-            getActivity(message, user);
-          }
-        }
-      } else if (args.length === 2) {
-        if (isNumeric(args[1])) {
-          if (isNumeric(args[0])) {
-            await client.users
-              .fetch(args[0])
-              .then((user) => {
-                getActivity(message, user, parseInt(args[1]));
-              })
-              .catch(() => {
-                message.channel
-                  .send('Syntax: "-macheck (ID | @User) <Tage>"!')
-                  .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                  });
-              });
-          } else {
-            const user = message.mentions.users.first();
-            if (user === undefined) {
-              message
-                .reply('Syntax: "-macheck (ID | @User) <Tage>"!')
-                .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                });
-            } else {
-              getActivity(message, user, parseInt(args[1]));
-            }
-          }
-        } else {
-          message
-            .reply('Syntax: "-macheck (ID | @User) <Tage>"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else {
-        message.reply('Syntax: "-macheck (ID | @User) <Tage>"!').then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-      }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // Delete Last Waffen Command
-  else if (command === "wdelete") {
-    if (args.length === 0) {
-      deletelast(message);
-    } else {
-      message
-        .reply('Syntax: "-mwdelete"!')
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // Abgaben Nachricht erzeugen Command
-  else if (command === "abgabenmessage") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
-      if (args.length === 0) {
-        let check = false;
-        let channel = message.guild.channels.cache.get(config.abgabenchannel);
-        channel.messages
-          .fetch({ limit: 5 })
-          .then((messages) => {
-            messages.each((smessage) => {
-              if (
-                smessage.content.includes(`**${getWeekNumber(new Date())}**`)
-              ) {
-                check = true;
-              }
-            });
           })
-          .then(() => {
-            if (check === false) {
-              sendAbgabenMessage(message, channel);
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            } else {
-              message
-                .reply(
-                  "Fehler: Die Abgabennachricht wurde in dieser Woche bereits gesendet!"
-                )
-                .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                });
-            }
-          });
-      } else {
-        message.reply('Syntax: "-mabgabenmessage"!').then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-      }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // UG-Abgaben Nachricht erzeugen Command
-  else if (command === "abgabenmessageug") {
-    if (
-      isLeaderschaft(message) ||
-      isFamilienrat(message) ||
-      isUGLeitung(message)
-    ) {
-      if (args.length === 0) {
-        let check = false;
-        let channel = message.guild.channels.cache.get(config.abgabenchannelUG);
-        channel.messages
-          .fetch({ limit: 5 })
-          .then((messages) => {
-            messages.each((smessage) => {
-              if (
-                smessage.content.includes(`**${getWeekNumber(new Date())}**`)
-              ) {
-                check = true;
-              }
-            });
-          })
-          .then(() => {
-            if (check === false) {
-              sendAbgabenMessageUG(message, channel);
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            } else {
-              message
-                .reply(
-                  "Fehler: Die UG-Abgabennachricht wurde in dieser Woche bereits gesendet!"
-                )
-                .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                });
-            }
-          });
-      } else {
-        message.reply('Syntax: "-mabgabenmessageUG"!').then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-      }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-  // Abgabenstatus ändern Command
-  else if (command === "abgaben") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
-      if (args.length == 2) {
-        if (isNumeric(args[1])) {
-          if (isNumeric(args[0])) {
-            await client.users
-              .fetch(args[0])
-              .then((user) => {
-                toggleAbgaben(message, user, args[1]);
-              })
-              .catch(() => {
-                message
-                  .reply('Syntax: "-mabgaben (ID | @User) (KW)"!')
-                  .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                  });
-              });
-          } else {
-            const user = message.mentions.users.first();
-            if (user === undefined) {
-              message
-                .reply('Syntax: "-mabgaben (ID | @User) (KW)"!')
-                .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                });
-            } else {
-              toggleAbgaben(message, user, args[1]);
-            }
-          }
-        } else {
-          message
-            .reply('Syntax: "-mabgaben (ID | @User) (KW)"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else if (args.length == 1) {
-        if (isNumeric(args[0])) {
-          await client.users
-            .fetch(args[0])
-            .then((user) => {
-              toggleAbgaben(message, user, getWeekNumber(new Date()));
-            })
-            .catch(() => {
-              message
-                .reply('Syntax: "-mabgaben (ID | @User) <KW>"!')
-                .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                });
-            });
-        } else {
-          const user = message.mentions.users.first();
-          if (user === undefined) {
-            message
-              .reply('Syntax: "-mabgaben (ID | @User) <KW>"!')
-              .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          } else {
-            toggleAbgaben(message, user, getWeekNumber(new Date()));
-          }
-        }
-      } else {
-        message.reply('Syntax: "-mabgaben (ID | @User) <KW>"!').then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-      }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-
-  // Clean Abgaben Command
-  else if (command === "cleanabgaben") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
-      if (args.length === 1) {
-        if (isNumeric(args[0])) {
-          cleanAbgaben(message, args[0]);
-        } else {
-          message
-            .reply('Syntax: "-mcleanabgaben (KW)"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else {
-        message.reply('Syntax: "-mcleanabgaben (KW)"!').then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-      }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-
-  // Clean UG-Abgaben Command
-  else if (command === "cleanabgabenug") {
-    if (
-      isLeaderschaft(message) ||
-      isFamilienrat(message) ||
-      isUGLeitung(message)
-    ) {
-      if (args.length === 1) {
-        if (isNumeric(args[0])) {
-          cleanAbgabenUG(message, args[0]);
-        } else {
-          message
-            .reply('Syntax: "-mcleanabgabenUG (KW)"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else {
-        message.reply('Syntax: "-mcleanabgabenUG (KW)"!').then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-      }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }
-
-  // UG-Abgabenstatus ändern Command
-  else if (command === "abgabenug") {
-    if (
-      isLeaderschaft(message) ||
-      isFamilienrat(message) ||
-      isUGLeitung(message)
-    ) {
-      if (args.length === 2) {
-        if (isNumeric(args[1])) {
-          if (isNumeric(args[0])) {
-            await client.users
-              .fetch(args[0])
-              .then((user) => {
-                toggleAbgabenUG(message, user, args[1]);
-              })
-              .catch(() => {
-                message
-                  .reply('Syntax: "-mabgabenUG (ID | @User) (KW)"!')
-                  .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                  });
-              });
-          } else {
-            const user = message.mentions.users.first();
-            if (user === undefined) {
-              message
-                .reply('Syntax: "-mabgabenUG (ID | @User) (KW)"!')
-                .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                });
-            } else {
-              toggleAbgabenUG(message, user, args[1]);
-            }
-          }
-        } else {
-          message
-            .reply('Syntax: "-mabgabenUG (ID | @User) (KW)"!')
-            .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-        }
-      } else {
-        message
-          .reply('Syntax: "-mabgabenUG (ID | @User) (KW)"!')
-          .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+          .catch((error) => {
+            console.error(error);
           });
       }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
     }
-  }
-  // Verkauf Hinzufügen Command
-  else if (command === "add") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
-      if (message.channel.id == config.routechannel) {
-        if (args.length == 2) {
-          if (isNumeric(args[1])) {
-            if (isNumeric(args[0])) {
-              const user = await client.users
-                .fetch(args[0])
-                .catch(console.error);
+    // Waffenverkauf Zusammenfassen Command
+    else if (command === "wsum") {
+      if (isLeaderschaft(message) || isFamilienrat(message)) {
+        if (message.channel.id == config.waffenchannel) {
+          if (args.length === 0) {
+            let cut = false;
+            let weapons = new Map();
+            message.channel.messages.fetch().then((messages) => {
+              messages.each(async (message) => {
+                if (cut === false) {
+                  if (message.partial) await message.fetch();
+                  if (message.content.includes("**Insgesamt:**")) {
+                    cut = true;
+                  } else if (
+                    message.author.bot &&
+                    message.content.includes("Waffen:")
+                  ) {
+                    let messagestring = message.content.split("\n");
+                    messagestring.shift();
+                    messagestring.shift();
+                    let weaponsmessage = new Map();
+                    messagestring.forEach((part) => {
+                      let parts = part.split(" ");
+                      weaponsmessage.set(parts[1], parts[0].slice(0, -1));
+                    });
+                    weaponsmessage.forEach((element, index) => {
+                      if (weapons.has(index)) {
+                        weapons.set(
+                          index,
+                          parseInt(weapons.get(index)) + parseInt(element)
+                        );
+                      } else {
+                        weapons.set(index, parseInt(element));
+                      }
+                    });
+                  }
+                }
+              });
+              let preis = 0;
+              let langwaffen = 0;
+              let waffen = new Map(Object.entries(config.waffen));
+              let messagestring = `**Insgesamt:**\n\n`;
+              weapons.forEach((element, index) => {
+                if (
+                  index == "adw" ||
+                  index == "spezi" ||
+                  index == "kompakt" ||
+                  index == "gusenberg" ||
+                  index == "ak"
+                ) {
+                  langwaffen = langwaffen + element;
+                }
+                messagestring = `${messagestring}> ${index}: ${element}\n`;
+                preis = preis + element * waffen.get(index);
+              });
+
+              messagestring = `${messagestring}\nPreis: **${addDots(preis)}$**`;
+              messagestring = `${messagestring}\nLangwaffen: **${addDots(
+                langwaffen
+              )}**`;
               message.channel
-                .send(
-                  `${user} hat ${addDots(args[1])} ${
-                    config.droge
-                  } abgegeben → ${addDots(args[1] * config.preisavv)}$`
-                )
+                .send(messagestring)
                 .then(() => {
                   message
                     .delete({ timeout: config.timeout })
                     .catch((error) => {});
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            });
+          } else {
+            message
+              .reply('Syntax: "' + config.prefix + 'wsum"!')
+              .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
+                message
+                  .delete({ timeout: config.timeout })
+                  .catch((error) => {});
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        } else {
+          message
+            .reply(`Fehler: Nur im <#${config.waffenchannel}> Channel möglich!`)
+            .then((msg) => {
+              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              message.delete({ timeout: config.timeout }).catch((error) => {});
+            });
+        }
+      } else {
+        message
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+    // Delete Last Waffen Command
+    else if (command === "wdelete") {
+      if (args.length === 0) {
+        deletelast(message);
+      } else {
+        message
+          .reply('Syntax: "' + config.prefix + 'wdelete"!')
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+  }
+  // Anwesenheit
+  if (config.anwesenheitchannel !== "0") {
+    // Online stellen Command
+    if (command === "on") {
+      if (message.channel.id == config.anwesenheitchannel) {
+        if (args.length === 0) {
+          activityOn(message, message.author, 1);
+        } else if (args.length === 1) {
+          if (args[0].match(pattern)) {
+            activityOn(message, message.author, 1, args[0]);
+          } else {
+            message
+              .reply('Syntax: "' + config.prefix + 'on <Zeit>"!')
+              .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
+                message
+                  .delete({ timeout: config.timeout })
+                  .catch((error) => {});
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        } else {
+          message
+            .reply('Syntax: "' + config.prefix + 'on <Zeit>"!')
+            .then((msg) => {
+              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              message.delete({ timeout: config.timeout }).catch((error) => {});
+            });
+        }
+      } else {
+        message
+          .reply(
+            `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
+          )
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+    // Offline stellen Command
+    else if (command === "off") {
+      if (message.channel.id == config.anwesenheitchannel) {
+        if (args.length === 0) {
+          activityOff(message, message.author, 1);
+        } else if (args.length === 1) {
+          if (args[0].match(pattern)) {
+            activityOff(message, message.author, 1, args[0]);
+          } else {
+            message
+              .reply('Syntax: "' + config.prefix + 'off <Zeit>"!')
+              .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
+                message
+                  .delete({ timeout: config.timeout })
+                  .catch((error) => {});
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        } else {
+          message
+            .reply('Syntax: "' + config.prefix + 'off <Zeit>"!')
+            .then((msg) => {
+              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              message.delete({ timeout: config.timeout }).catch((error) => {});
+            });
+        }
+      } else {
+        message
+          .reply(
+            `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
+          )
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+    // Andere User Online stellen Command
+    else if (command === "aon") {
+      if (isLeaderschaft(message) || isFamilienrat(message)) {
+        if (message.channel.id == config.anwesenheitchannel) {
+          if (args.length === 1) {
+            if (isNumeric(args[0])) {
+              await client.users
+                .fetch(args[0])
+                .then((user) => {
+                  activityOn(message, user, 2);
+                })
+                .catch(() => {
+                  message.channel
+                    .send(
+                      'Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!'
+                    )
+                    .then((msg) => {
+                      msg
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                      message
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                    });
                 });
             } else {
               const user = message.mentions.users.first();
               if (user === undefined) {
                 message
-                  .reply('Syntax: "-madd <ID | @User> <Menge>"!')
+                  .reply(
+                    'Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!'
+                  )
                   .then((msg) => {
                     msg
                       .delete({ timeout: config.timeout })
@@ -1698,6 +889,603 @@ client.on("message", async (message) => {
                       .catch((error) => {});
                   });
               } else {
+                activityOn(message, user, 2);
+              }
+            }
+          } else if (args.length === 2) {
+            if (args[1].match(pattern)) {
+              if (isNumeric(args[0])) {
+                await client.users
+                  .fetch(args[0])
+                  .then((user) => {
+                    activityOn(message, user, 2, args[1]);
+                  })
+                  .catch(() => {
+                    message.channel
+                      .send(
+                        'Syntax: "' +
+                          config.prefix +
+                          'aon (ID | @User) <Zeit>"!'
+                      )
+                      .then((msg) => {
+                        msg
+                          .delete({ timeout: config.timeout })
+                          .catch((error) => {});
+                        message
+                          .delete({ timeout: config.timeout })
+                          .catch((error) => {});
+                      })
+                      .catch((error) => {
+                        console.error(error);
+                      });
+                  });
+              } else {
+                const user = message.mentions.users.first();
+                if (user === undefined) {
+                  message
+                    .reply(
+                      'Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!'
+                    )
+                    .then((msg) => {
+                      msg
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                      message
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                    });
+                } else {
+                  activityOn(message, user, 2, args[1]);
+                }
+              }
+            } else {
+              message
+                .reply(
+                  'Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!'
+                )
+                .then((msg) => {
+                  msg.delete({ timeout: config.timeout }).catch((error) => {});
+                  message
+                    .delete({ timeout: config.timeout })
+                    .catch((error) => {});
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            }
+          } else {
+            message
+              .reply('Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!')
+              .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
+                message
+                  .delete({ timeout: config.timeout })
+                  .catch((error) => {});
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        } else {
+          message
+            .reply(
+              `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
+            )
+            .then((msg) => {
+              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              message.delete({ timeout: config.timeout }).catch((error) => {});
+            });
+        }
+      } else {
+        message
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+    // Andere User Offline stellen Command
+    else if (command === "aoff") {
+      if (isLeaderschaft(message) || isFamilienrat(message)) {
+        if (message.channel.id == config.anwesenheitchannel) {
+          if (args.length === 1) {
+            if (isNumeric(args[0])) {
+              await client.users
+                .fetch(args[0])
+                .then((user) => {
+                  activityOff(message, user, 2);
+                })
+                .catch(() => {
+                  message.channel
+                    .send(
+                      'Syntax: "' + config.prefix + 'aoff (ID | @User) <Zeit>"!'
+                    )
+                    .then((msg) => {
+                      msg
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                      message
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                    });
+                });
+            } else {
+              const user = message.mentions.users.first();
+              if (user === undefined) {
+                message
+                  .reply(
+                    'Syntax: "' + config.prefix + 'aoff (ID | @User) <Zeit>"!'
+                  )
+                  .then((msg) => {
+                    msg
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                    message
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                  });
+              } else {
+                activityOff(message, user, 2);
+              }
+            }
+          } else if (args.length === 2) {
+            if (args[1].match(pattern)) {
+              if (isNumeric(args[0])) {
+                await client.users
+                  .fetch(args[0])
+                  .then((user) => {
+                    activityOff(message, user, 2, args[1]);
+                  })
+                  .catch(() => {
+                    message.channel
+                      .send(
+                        'Syntax: "' +
+                          config.prefix +
+                          'aoff (ID | @User) <Zeit>"!'
+                      )
+                      .then((msg) => {
+                        msg
+                          .delete({ timeout: config.timeout })
+                          .catch((error) => {});
+                        message
+                          .delete({ timeout: config.timeout })
+                          .catch((error) => {});
+                      })
+                      .catch((error) => {
+                        console.error(error);
+                      });
+                  });
+              } else {
+                const user = message.mentions.users.first();
+                if (user === undefined) {
+                  message
+                    .reply(
+                      'Syntax: "' + config.prefix + 'aoff (ID | @User) <Zeit>"!'
+                    )
+                    .then((msg) => {
+                      msg
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                      message
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                    });
+                } else {
+                  activityOff(message, user, 2, args[1]);
+                }
+              }
+            } else {
+              message
+                .reply(
+                  'Syntax: "' + config.prefix + 'aoff (ID | @User) <Zeit>"!'
+                )
+                .then((msg) => {
+                  msg.delete({ timeout: config.timeout }).catch((error) => {});
+                  message
+                    .delete({ timeout: config.timeout })
+                    .catch((error) => {});
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            }
+          } else {
+            message
+              .reply('Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!')
+              .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
+                message
+                  .delete({ timeout: config.timeout })
+                  .catch((error) => {});
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        } else {
+          message
+            .reply(
+              `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
+            )
+            .then((msg) => {
+              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              message.delete({ timeout: config.timeout }).catch((error) => {});
+            });
+        }
+      } else {
+        message
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+    // Aktivität Zusammenfassen Command
+    else if (command === "acheck") {
+      if (isLeaderschaft(message) || isFamilienrat(message)) {
+        if (args.length === 1) {
+          if (isNumeric(args[0])) {
+            await client.users
+              .fetch(args[0])
+              .then((user) => {
+                getActivity(message, user);
+              })
+              .catch(() => {
+                message.channel
+                  .send(
+                    'Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!'
+                  )
+                  .then((msg) => {
+                    msg
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                    message
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                  });
+              });
+          } else {
+            const user = message.mentions.users.first();
+            if (user === undefined) {
+              message
+                .send(
+                  'Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!'
+                )
+                .then((msg) => {
+                  msg.delete({ timeout: config.timeout }).catch((error) => {});
+                  message
+                    .delete({ timeout: config.timeout })
+                    .catch((error) => {});
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            } else {
+              getActivity(message, user);
+            }
+          }
+        } else if (args.length === 2) {
+          if (isNumeric(args[1])) {
+            if (isNumeric(args[0])) {
+              await client.users
+                .fetch(args[0])
+                .then((user) => {
+                  getActivity(message, user, parseInt(args[1]));
+                })
+                .catch(() => {
+                  message.channel
+                    .send(
+                      'Syntax: "' +
+                        config.prefix +
+                        'acheck (ID | @User) <Tage>"!'
+                    )
+                    .then((msg) => {
+                      msg
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                      message
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                    });
+                });
+            } else {
+              const user = message.mentions.users.first();
+              if (user === undefined) {
+                message
+                  .reply(
+                    'Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!'
+                  )
+                  .then((msg) => {
+                    msg
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                    message
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                  });
+              } else {
+                getActivity(message, user, parseInt(args[1]));
+              }
+            }
+          } else {
+            message
+              .reply(
+                'Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!'
+              )
+              .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
+                message
+                  .delete({ timeout: config.timeout })
+                  .catch((error) => {});
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        } else {
+          message
+            .reply('Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!')
+            .then((msg) => {
+              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              message.delete({ timeout: config.timeout }).catch((error) => {});
+            });
+        }
+      } else {
+        message
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+  }
+
+  // Abgaben
+  if (config.abgabenchannel !== "0") {
+    // Abgaben Nachricht erzeugen Command
+    if (command === "abgabenmessage") {
+      if (isLeaderschaft(message) || isFamilienrat(message)) {
+        if (args.length === 0) {
+          let check = false;
+          let channel = message.guild.channels.cache.get(config.abgabenchannel);
+          channel.messages
+            .fetch({ limit: 5 })
+            .then((messages) => {
+              messages.each((smessage) => {
+                if (
+                  smessage.content.includes(`**${getWeekNumber(new Date())}**`)
+                ) {
+                  check = true;
+                }
+              });
+            })
+            .then(() => {
+              if (check === false) {
+                sendAbgabenMessage(message, channel);
+                message
+                  .delete({ timeout: config.timeout })
+                  .catch((error) => {});
+              } else {
+                message
+                  .reply(
+                    "Fehler: Die Abgabennachricht wurde in dieser Woche bereits gesendet!"
+                  )
+                  .then((msg) => {
+                    msg
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                    message
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                  });
+              }
+            });
+        } else {
+          message
+            .reply('Syntax: "' + config.prefix + 'abgabenmessage"!')
+            .then((msg) => {
+              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              message.delete({ timeout: config.timeout }).catch((error) => {});
+            });
+        }
+      } else {
+        message
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+    // Abgabenstatus ändern Command
+    else if (command === "abgaben") {
+      if (isLeaderschaft(message) || isFamilienrat(message)) {
+        if (args.length == 2) {
+          if (isNumeric(args[1])) {
+            if (isNumeric(args[0])) {
+              await client.users
+                .fetch(args[0])
+                .then((user) => {
+                  toggleAbgaben(message, user, args[1]);
+                })
+                .catch(() => {
+                  message
+                    .reply(
+                      'Syntax: "' +
+                        config.prefix +
+                        'abgaben (ID | @User) <KW>"!'
+                    )
+                    .then((msg) => {
+                      msg
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                      message
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                    });
+                });
+            } else {
+              const user = message.mentions.users.first();
+              if (user === undefined) {
+                message
+                  .reply(
+                    'Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!'
+                  )
+                  .then((msg) => {
+                    msg
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                    message
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                  });
+              } else {
+                toggleAbgaben(message, user, args[1]);
+              }
+            }
+          } else {
+            message
+              .reply(
+                'Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!'
+              )
+              .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
+                message
+                  .delete({ timeout: config.timeout })
+                  .catch((error) => {});
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        } else if (args.length == 1) {
+          if (isNumeric(args[0])) {
+            await client.users
+              .fetch(args[0])
+              .then((user) => {
+                toggleAbgaben(message, user, getWeekNumber(new Date()));
+              })
+              .catch(() => {
+                message
+                  .reply(
+                    'Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!'
+                  )
+                  .then((msg) => {
+                    msg
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                    message
+                      .delete({ timeout: config.timeout })
+                      .catch((error) => {});
+                  });
+              });
+          } else {
+            const user = message.mentions.users.first();
+            if (user === undefined) {
+              message
+                .reply(
+                  'Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!'
+                )
+                .then((msg) => {
+                  msg.delete({ timeout: config.timeout }).catch((error) => {});
+                  message
+                    .delete({ timeout: config.timeout })
+                    .catch((error) => {});
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            } else {
+              toggleAbgaben(message, user, getWeekNumber(new Date()));
+            }
+          }
+        } else {
+          message
+            .reply('Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!')
+            .then((msg) => {
+              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              message.delete({ timeout: config.timeout }).catch((error) => {});
+            });
+        }
+      } else {
+        message
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+    // Clean Abgaben Command
+    else if (command === "cleanabgaben") {
+      if (isLeaderschaft(message) || isFamilienrat(message)) {
+        if (args.length === 1) {
+          if (isNumeric(args[0])) {
+            cleanAbgaben(message, args[0]);
+          } else {
+            message
+              .reply('Syntax: "' + config.prefix + 'cleanabgaben (KW)"!')
+              .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
+                message
+                  .delete({ timeout: config.timeout })
+                  .catch((error) => {});
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        } else {
+          message
+            .reply('Syntax: "' + config.prefix + 'cleanabgaben (KW)"!')
+            .then((msg) => {
+              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              message.delete({ timeout: config.timeout }).catch((error) => {});
+            });
+        }
+      } else {
+        message
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
+          .then((msg) => {
+            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+  }
+  // Routen-Verkauf
+  if (config.routechannel !== "0") {
+    // Verkauf Hinzufügen Command
+    if (command === "add") {
+      if (isLeaderschaft(message) || isFamilienrat(message)) {
+        if (message.channel.id == config.routechannel) {
+          if (args.length == 2) {
+            if (isNumeric(args[1])) {
+              if (isNumeric(args[0])) {
+                const user = await client.users
+                  .fetch(args[0])
+                  .catch(console.error);
                 message.channel
                   .send(
                     `${user} hat ${addDots(args[1])} ${
@@ -1709,11 +1497,51 @@ client.on("message", async (message) => {
                       .delete({ timeout: config.timeout })
                       .catch((error) => {});
                   });
+              } else {
+                const user = message.mentions.users.first();
+                if (user === undefined) {
+                  message
+                    .reply(
+                      'Syntax: "' + config.prefix + 'add <ID | @User> <Menge>"!'
+                    )
+                    .then((msg) => {
+                      msg
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                      message
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                    });
+                } else {
+                  message.channel
+                    .send(
+                      `${user} hat ${addDots(args[1])} ${
+                        config.droge
+                      } abgegeben → ${addDots(args[1] * config.preisavv)}$`
+                    )
+                    .then(() => {
+                      message
+                        .delete({ timeout: config.timeout })
+                        .catch((error) => {});
+                    });
+                }
               }
+            } else {
+              message
+                .reply("Syntax: Das ist keine gültige Menge!")
+                .then((msg) => {
+                  msg.delete({ timeout: config.timeout }).catch((error) => {});
+                  message
+                    .delete({ timeout: config.timeout })
+                    .catch((error) => {});
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
             }
           } else {
             message
-              .reply("Syntax: Das ist keine gültige Menge!")
+              .reply('Syntax: "' + config.prefix + 'add <ID | @User> <Menge>"!')
               .then((msg) => {
                 msg.delete({ timeout: config.timeout }).catch((error) => {});
                 message
@@ -1726,61 +1554,52 @@ client.on("message", async (message) => {
           }
         } else {
           message
-            .reply('Syntax: "-madd <ID | @User> <Menge>"!')
+            .reply(`Fehler: Nur im <#${config.routechannel}> Channel möglich!`)
             .then((msg) => {
               msg.delete({ timeout: config.timeout }).catch((error) => {});
               message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
             });
         }
       } else {
         message
-          .reply(`Fehler: Nur im <#${config.routechannel}> Channel möglich!`)
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
             msg.delete({ timeout: config.timeout }).catch((error) => {});
             message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
           });
       }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
     }
-  }
-  // Verkauf Zusammenfassen Command
-  else if (command === "sum") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
-      if (message.channel.id == config.routechannel) {
-        if (args.length === 0) {
-          let cut = false;
-          let amount = 0;
-          message.channel.messages.fetch().then((messages) => {
-            messages.each((message) => {
-              if (cut === false) {
-                if (message.content.includes("Insgesamt:")) {
-                  cut = true;
-                } else if (message.content.includes("abgegeben")) {
-                  amount =
-                    amount +
-                    parseInt(message.content.split(" ")[2].split(".").join(""));
+    // Verkauf Zusammenfassen Command
+    else if (command === "sum") {
+      if (isLeaderschaft(message) || isFamilienrat(message)) {
+        if (message.channel.id == config.routechannel) {
+          if (args.length === 0) {
+            let cut = false;
+            let amount = 0;
+            message.channel.messages.fetch().then((messages) => {
+              messages.each((message) => {
+                if (cut === false) {
+                  if (message.content.includes("Insgesamt:")) {
+                    cut = true;
+                  } else if (message.content.includes("abgegeben")) {
+                    amount =
+                      amount +
+                      parseInt(
+                        message.content.split(" ")[2].split(".").join("")
+                      );
+                  }
                 }
-              }
-            });
-            timestring =
-              Math.floor((amount * 2) / 3600) +
-              " Stunden " +
-              Math.floor(((amount * 2) % 3600) / 60) +
-              " Minuten";
-            message.channel
-              /*.send(
+              });
+              timestring =
+                Math.floor((amount * 2) / 3600) +
+                " Stunden " +
+                Math.floor(((amount * 2) % 3600) / 60) +
+                " Minuten";
+              message.channel
+                /*.send(
                 `Insgesamt: ${addDots(amount)} ${
                   config.droge
                 } → Schwarz: **${addDots(amount * config.preiss)}$**,
@@ -1790,19 +1609,32 @@ client.on("message", async (message) => {
                   amount * config.preisg - amount * config.preisavv
                 )}$**``, Zeit: **${timestring}**`
               )*/
-              .send(
-                `Insgesamt: ${addDots(amount)} ${
-                  config.droge
-                } → Grün: **${addDots(
-                  amount * config.preisg
-                )}$**, davon Geld an Leaderschaft: **${addDots(
-                  amount * config.preisg - amount * config.preisavv
-                )}$** ➜ Anteil pro Leaderschafter: **${addDots(
-                  (amount * config.preisg - amount * config.preisavv) /
-                    config.leaderschafter
-                )}$**`
-              )
-              .then(() => {
+                .send(
+                  `Insgesamt: ${addDots(amount)} ${
+                    config.droge
+                  } → Grün: **${addDots(
+                    amount * config.preisg
+                  )}$**, davon Geld an Leaderschaft: **${addDots(
+                    amount * config.preisg - amount * config.preisavv
+                  )}$** ➜ Anteil pro Leaderschafter: **${addDots(
+                    (amount * config.preisg - amount * config.preisavv) /
+                      config.leaderschafter
+                  )}$**`
+                )
+                .then(() => {
+                  message
+                    .delete({ timeout: config.timeout })
+                    .catch((error) => {});
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            });
+          } else {
+            message
+              .reply('Syntax: "' + config.prefix + 'sum"!')
+              .then((msg) => {
+                msg.delete({ timeout: config.timeout }).catch((error) => {});
                 message
                   .delete({ timeout: config.timeout })
                   .catch((error) => {});
@@ -1810,36 +1642,26 @@ client.on("message", async (message) => {
               .catch((error) => {
                 console.error(error);
               });
-          });
+          }
         } else {
           message
-            .reply('Syntax: "-msum"!')
+            .reply(`Fehler: Nur im <#${config.routechannel}> Channel möglich!`)
             .then((msg) => {
               msg.delete({ timeout: config.timeout }).catch((error) => {});
               message.delete({ timeout: config.timeout }).catch((error) => {});
-            })
-            .catch((error) => {
-              console.error(error);
             });
         }
       } else {
         message
-          .reply(`Fehler: Nur im <#${config.routechannel}> Channel möglich!`)
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
             msg.delete({ timeout: config.timeout }).catch((error) => {});
             message.delete({ timeout: config.timeout }).catch((error) => {});
+          })
+          .catch((error) => {
+            console.error(error);
           });
       }
-    } else {
-      message
-        .reply(`Fehler: Du hast nicht genug Rechte!`)
-        .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        })
-        .catch((error) => {
-          console.error(error);
-        });
     }
   }
   // Help Command
@@ -1848,46 +1670,58 @@ client.on("message", async (message) => {
       message
         .reply(
           `Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:` +
-            '\n - "-mon <Zeit>" um dich online zu stellen' +
-            '\n - "-moff <Zeit>" um dich offline zu stellen' +
-            '\n - "-maon (ID | @User) <Zeit>" um einen anderen User online zu stellen' +
-            '\n - "-maoff (ID | @User) <Zeit>" um einen anderen User offline zu stellen' +
-            '\n - "-madd (ID | @User) (Menge)" um eine Abgabe hinzuzufügen' +
-            '\n - "-msum" um die letzten Abgaben zusammenzufassen' +
-            '\n - "-macheck (ID | @User) <Tage>" um die Aktivität der letzten ' +
-            config.activitycheckdaysdefault +
-            " Tage bzw. angegeben Tage zu bekommen" +
-            '\n - "-mabgaben (ID | @User) <KW>" um die Abgaben für ein Mitglied für eine Woche zu ändern' +
-            '\n - "-mabgabenmessage" um die Abgabennachricht für die Woche zu schicken' +
-            '\n - "-mcleanabgaben (KW)" um die Abgabennachricht für angegebene Woche zu "bereinigen"' +
-            '\n - "-mabgabenUG (ID | @User) (KW)" um die Abgaben für ein UG-Mitglied für eine Woche zu ändern' +
-            '\n - "-mabgabenmessageUG" um die UG-Abgabennachricht für die Woche zu schicken' +
-            '\n - "-mcleanabgabenUG (KW)" um die UG-Abgabennachricht für angegebene Woche zu "bereinigen"' +
-            '\n - "-mwaffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
-            "\nEs gibt nur folgende Waffen: " +
-            config.waffenstring +
-            '\n - "-mwdelete" um die letzte Waffenbestellung zu löschen' +
-            '\n - "-mwsum" um die Waffenbestellung zusammenzufassen' +
-            '\n - "-mhelp" um diese Nachricht zu bekommen'
-        )
-        .then((msg) => {
-          msg.react("🗑️");
-          message.delete({ timeout: config.timeout }).catch((error) => {});
-        });
-    } else if (isUGLeitung(message)) {
-      message
-        .reply(
-          `Hilfe [**<> → Optionale Angabe**]:` +
-            '\n - "-mon <Zeit>" um dich online zu stellen' +
-            '\n - "-moff <Zeit>" um dich offline zu stellen' +
-            '\n - "-mabgabenUG (ID | @User) <KW>" um die Abgaben für ein UG-Mitglied für eine Woche zu ändern' +
-            '\n - "-mabgabenmessageUG" um die UG-Abgabennachricht für die Woche zu schicken' +
-            '\n - "-mcleanabgabenUG (KW)" um die UG-Abgabennachricht für angegebene Woche zu "bereinigen"' +
-            '\n - "-mwaffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
-            "\nEs gibt nur folgende Waffen: " +
-            config.waffenstring +
-            '\n - "-mwdelete" um die letzte Waffenbestellung zu löschen' +
-            '\n - "-mhelp" um diese Nachricht zu bekommen'
+            config.anwesenheitchannel !==
+            "0"
+            ? '\n - "' +
+                config.prefix +
+                'on <Zeit>" um dich online zu stellen' +
+                '\n - "' +
+                config.prefix +
+                'off <Zeit>" um dich offline zu stellen' +
+                '\n - "' +
+                config.prefix +
+                'aon (ID | @User) <Zeit>" um einen anderen User online zu stellen' +
+                '\n - "' +
+                config.prefix +
+                'aoff (ID | @User) <Zeit>" um einen anderen User offline zu stellen' +
+                '\n - "' +
+                config.prefix +
+                'acheck (ID | @User) <Tage>" um die Aktivität der letzten ' +
+                config.activitycheckdaysdefault +
+                " Tage bzw. angegeben Tage zu bekommen"
+            : "" + config.routechannel !== "0"
+            ? '\n - "' +
+              config.prefix +
+              'add (ID | @User) (Menge)" um eine Abgabe hinzuzufügen' +
+              '\n - "' +
+              config.prefix +
+              'sum" um die letzten Abgaben zusammenzufassen'
+            : "" + config.abgabenchannel !== "0"
+            ? '\n - "' +
+              config.prefix +
+              'abgaben (ID | @User) <KW>" um die Abgaben für ein Mitglied für eine Woche zu ändern' +
+              '\n - "' +
+              config.prefix +
+              'abgabenmessage" um die Abgabennachricht für die Woche zu schicken' +
+              '\n - "' +
+              config.prefix +
+              'cleanabgaben (KW)" um die Abgabennachricht für angegebene Woche zu "bereinigen"'
+            : "" + config.waffenchannel !== "0"
+            ? '\n - "' +
+              config.prefix +
+              'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
+              "\nEs gibt nur folgende Waffen: " +
+              config.waffenstring +
+              '\n - "' +
+              config.prefix +
+              'wdelete" um die letzte Waffenbestellung zu löschen' +
+              '\n - "' +
+              config.prefix +
+              'wsum" um die Waffenbestellung zusammenzufassen'
+            : "" +
+              '\n - "' +
+              config.prefix +
+              'help" um diese Nachricht zu bekommen'
         )
         .then((msg) => {
           msg.react("🗑️");
@@ -1896,14 +1730,27 @@ client.on("message", async (message) => {
     } else {
       message
         .reply(
-          `Hilfe [**<> → Optionale Angabe**]:` +
-            '\n - "-mon <Zeit>" um dich online zu stellen' +
-            '\n - "-moff <Zeit>" um dich offline zu stellen' +
-            '\n - "-mwaffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
-            "\nEs gibt nur folgende Waffen: " +
-            config.waffenstring +
-            '\n - "-mwdelete" um die letzte Waffenbestellung zu löschen' +
-            '\n - "-mhelp" um diese Nachricht zu bekommen'
+          `Hilfe [**<> → Optionale Angabe**]:` + config.anwesenheitchannel !==
+            "0"
+            ? '\n - "' +
+                config.prefix +
+                'on <Zeit>" um dich online zu stellen' +
+                '\n - "' +
+                config.prefix +
+                'off <Zeit>" um dich offline zu stellen'
+            : "" + config.waffenchannel !== "0"
+            ? '\n - "' +
+              config.prefix +
+              'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
+              "\nEs gibt nur folgende Waffen: " +
+              config.waffenstring +
+              '\n - "' +
+              config.prefix +
+              'wdelete" um die letzte Waffenbestellung zu löschen'
+            : "" +
+              '\n - "' +
+              config.prefix +
+              'help" um diese Nachricht zu bekommen'
         )
         .then((msg) => {
           msg.react("🗑️");
