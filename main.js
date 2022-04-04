@@ -1670,7 +1670,7 @@ client.on("message", async (message) => {
       message
         .reply(
           `Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:` +
-            config.anwesenheitchannel !==
+            config.anwesenheitchannel !=
             "0"
             ? '\n - "' +
                 config.prefix +
@@ -1689,14 +1689,14 @@ client.on("message", async (message) => {
                 'acheck (ID | @User) <Tage>" um die Aktivität der letzten ' +
                 config.activitycheckdaysdefault +
                 " Tage bzw. angegeben Tage zu bekommen"
-            : "" + config.routechannel !== "0"
+            : "" + config.routechannel != "0"
             ? '\n - "' +
               config.prefix +
               'add (ID | @User) (Menge)" um eine Abgabe hinzuzufügen' +
               '\n - "' +
               config.prefix +
               'sum" um die letzten Abgaben zusammenzufassen'
-            : "" + config.abgabenchannel !== "0"
+            : "" + config.abgabenchannel != "0"
             ? '\n - "' +
               config.prefix +
               'abgaben (ID | @User) <KW>" um die Abgaben für ein Mitglied für eine Woche zu ändern' +
@@ -1706,7 +1706,7 @@ client.on("message", async (message) => {
               '\n - "' +
               config.prefix +
               'cleanabgaben (KW)" um die Abgabennachricht für angegebene Woche zu "bereinigen"'
-            : "" + config.waffenchannel !== "0"
+            : "" + config.waffenchannel != "0"
             ? '\n - "' +
               config.prefix +
               'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
@@ -1738,7 +1738,7 @@ client.on("message", async (message) => {
                 '\n - "' +
                 config.prefix +
                 'off <Zeit>" um dich offline zu stellen'
-            : "" + config.waffenchannel !== "0"
+            : "" + config.waffenchannel != "0"
             ? '\n - "' +
               config.prefix +
               'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!' +
