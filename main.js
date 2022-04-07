@@ -221,7 +221,6 @@ function toggleAbgaben(message, user, kw) {
 
 // Abgaben Message Funktion
 function sendAbgabenMessage(message, channel) {
-  console.log(message.guild.members.cache);
   var string = [];
   string.push(
     `Abgaben (${config.abgabenstring}) - KW **${getWeekNumber(new Date())}**`
