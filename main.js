@@ -1,12 +1,17 @@
 const Discord = require("discord.js");
-
-const intents = new Discord.Intents(Discord.Intents.ALL);
-const client = new Discord.Client({
-  partials: ["MESSAGE", "CHANNEL", "REACTION"],
-  ws: { intents },
-});
-
+const fs = require("fs");
+const { REST } = require("@discordjs/rest");
+const { Routes } = require("discord-api-types/v9");
 const config = require("./config.json");
+
+const client = new Discord.Client({
+  intents: [
+    Discord.Intents.FLAGS.GUILDS,
+    Discord.Intents.FLAGS.GUILD_MESSAGES,
+    Discord.Intents.FLAGS.GUILD_MEMBERS,
+    Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+  ],
+});
 
 // Regex der Uhrzeit
 const pattern = new RegExp(/\d{2}:\d{2}/);
@@ -79,17 +84,17 @@ function logEmbed(member, title, description) {
   const embed = new Discord.MessageEmbed()
     .setColor(config.colorhex)
     .setDescription(title)
-    .setAuthor(
-      `${member.user.username}#${member.user.discriminator}`,
-      member.user.displayAvatarURL()
-    )
+    .setAuthor({
+      name: `${member.user.username}#${member.user.discriminator}`,
+      iconURL: member.user.displayAvatarURL(),
+    })
     .addFields({ name: "Auswirkung", value: description })
-    .setThumbnail(client.user.displayAvatarURL())
+    .setThumbnail(member.guild.iconURL())
     .setTimestamp()
-    .setFooter(member.guild.name);
+    .setFooter({ text: member.guild.name });
 
   let channel = member.guild.channels.cache.get(config.logchannel);
-  channel.send({ embed: embed });
+  channel.send({ embeds: [embed] });
 }
 
 // Clean Abgabenliste Funktion
@@ -135,13 +140,13 @@ function cleanAbgaben(message, kw) {
           "Fehler: Die Nachricht für diese Kalenderwoche fehlt noch, oder liegt zu weit in der Vergangenheit!"
         )
         .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
+          setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
         })
         .catch((error) => {
           console.error(error);
         });
     }
-    message.delete({ timeout: config.timeout }).catch((error) => {});
+    setTimeout(() => message.delete().catch((error) => {}), config.timeout);
   });
 }
 
@@ -192,7 +197,10 @@ function toggleAbgaben(message, user, kw) {
               "Fehler: Das Mitglied muss diese Woche noch keine Abgaben zahlen!"
             )
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       }
@@ -203,10 +211,10 @@ function toggleAbgaben(message, user, kw) {
           "Fehler: Die Nachricht für diese Kalenderwoche fehlt noch, oder liegt zu weit in der Vergangenheit!"
         )
         .then((msg) => {
-          msg.delete({ timeout: config.timeout }).catch((error) => {});
+          setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
         });
     }
-    message.delete({ timeout: config.timeout }).catch((error) => {});
+    setTimeout(() => message.delete().catch((error) => {}), config.timeout);
   });
 }
 
@@ -255,10 +263,14 @@ async function deletelast(message) {
               message
                 .reply("Du hast deine letzte Waffenbestellung gelöscht!")
                 .then((msg) => {
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
+                  setTimeout(
+                    () => msg.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 });
             } else {
               message
@@ -266,10 +278,14 @@ async function deletelast(message) {
                   "Fehler: Deine Waffenbestellung ist schon bezahlt, melde dich bei der Leaderschaft um sie zu löschen!"
                 )
                 .then((msg) => {
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
+                  setTimeout(
+                    () => msg.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 });
             }
           }
@@ -283,8 +299,11 @@ async function deletelast(message) {
             "Fehler: Es konnte keine Waffenbestellung von dir gefunden werden!"
           )
           .then((msg) => {
-            message.delete({ timeout: config.timeout }).catch((error) => {});
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
           });
       }
     });
@@ -374,7 +393,7 @@ async function getActivity(message, user, days) {
         `> Zeit insgesamt: **${timestring}**\n> Zeit im Durchschnitt pro Tag: **${timestringday}**`
     )
     .then(() => {
-      message.delete({ timeout: config.timeout }).catch((error) => {});
+      setTimeout(() => message.delete().catch((error) => {}), config.timeout);
     })
     .catch((error) => {
       console.error(error);
@@ -401,9 +420,10 @@ function activityOn(message, user, type, time) {
                     "Fehler: Du musst dich zuerst offline stellen, um dich online zu stellen!"
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               } else {
                 message
@@ -413,16 +433,17 @@ function activityOn(message, user, type, time) {
                       " zuerst offline stellen, um ihn online zu stellen!"
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               }
             }
           }
         }
       });
-      message.delete({ timeout: config.timeout }).catch((error) => {});
+      setTimeout(() => message.delete().catch((error) => {}), config.timeout);
     })
     .then(() => {
       if (check === true) {
@@ -465,9 +486,10 @@ function activityOff(message, user, type, time) {
                     "Fehler: Du musst zuerst online gewesen sein, um dich offline zu stellen!"
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               } else {
                 message
@@ -477,16 +499,17 @@ function activityOff(message, user, type, time) {
                       " zuerst online stellen, um ihn offline zu stellen!"
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               }
             }
           }
         }
       });
-      message.delete({ timeout: config.timeout }).catch((error) => {});
+      setTimeout(() => message.delete().catch((error) => {}), config.timeout);
     })
     .then(() => {
       if (cut === false) {
@@ -495,20 +518,105 @@ function activityOff(message, user, type, time) {
             "Fehler: Du musst zuerst online gewesen sein, um dich offline zu stellen!"
           )
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
           });
       }
     });
 }
 
-client.on("ready", async () => {
+const commandsFiles = fs
+  .readdirSync("./commands")
+  .filter((file) => file.endsWith(".js"));
+
+const commands = [];
+
+client.commands = new Discord.Collection();
+
+for (const file of commandsFiles) {
+  const command = require(`./commands/${file}`);
+  commands.push(command.data.toJSON());
+  client.commands.set(command.data.name, command);
+}
+
+const contextFiles = fs
+  .readdirSync("./context")
+  .filter((file) => file.endsWith(".js"));
+
+for (const file of contextFiles) {
+  const command = require(`./context/${file}`);
+  commands.push(command.data);
+  client.commands.set(command.data.name, command);
+}
+
+client.once("ready", async () => {
   console.log(config.startmessage);
   console.log("----");
 
   client.user.setActivity(config.prefix + "help");
+
+  const CLIENT_ID = client.user.id;
+
+  const rest = new REST({
+    version: "9",
+  }).setToken(config.token);
+
+  (async () => {
+    try {
+      if (config.status == true) {
+        await rest.put(Routes.applicationCommands(CLIENT_ID), {
+          body: commands,
+        });
+        console.log("Commands wurde global registriert!");
+      } else {
+        await rest.put(
+          Routes.applicationGuildCommands(CLIENT_ID, config.guildID),
+          {
+            body: commands,
+          }
+        );
+        console.log("Commands wurde lokal registriert!");
+      }
+    } catch (err) {
+      if (err) console.error(err);
+    }
+  })();
 });
 
-client.on("message", async (message) => {
+client.on("interactionCreate", async (interaction) => {
+  if (interaction.isCommand()) {
+    const command = client.commands.get(interaction.commandName);
+
+    if (!command) return;
+
+    try {
+      await command.execute(interaction);
+    } catch (err) {
+      if (err) console.error(err);
+      await interaction.reply({
+        content: "Fehler bei der Interaction",
+        ephemeral: true,
+      });
+    }
+  }
+
+  if (interaction.isContextMenu()) {
+    const command = client.commands.get(interaction.commandName);
+
+    if (!command) return;
+
+    try {
+      await command.execute(interaction);
+    } catch (err) {
+      if (err) console.error(err);
+      await interaction.reply({
+        content: "Fehler bei der Interaction",
+        ephemeral: true,
+      });
+    }
+  }
+});
+
+client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   // Bilder-Channel Delete
   if (config.bildchannel !== "0") {
@@ -555,12 +663,14 @@ client.on("message", async (message) => {
                         'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!'
                     )
                     .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
+                      setTimeout(
+                        () => msg.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
                     });
                   break;
                 }
@@ -574,10 +684,11 @@ client.on("message", async (message) => {
                       config.waffenstring
                   )
                   .then((msg) => {
-                    msg.delete({ timeout: 10000 }).catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(() => msg.delete().catch((error) => {}), 10000);
+                    setTimeout(
+                      () => message.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
                 break;
               }
@@ -590,9 +701,10 @@ client.on("message", async (message) => {
               message.channel
                 .send(string)
                 .then((msg) => {
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 })
                 .catch((error) => {
                   console.error(error);
@@ -606,10 +718,14 @@ client.on("message", async (message) => {
                   'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!'
               )
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -623,16 +739,25 @@ client.on("message", async (message) => {
                 'waffen <Waffennamen> <Anzahl> <Waffennamen2> <Anzahl2> <...>"!'
             )
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Nur im <#${config.waffenchannel}> Channel möglich!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -702,9 +827,10 @@ client.on("message", async (message) => {
               message.channel
                 .send(messagestring)
                 .then(() => {
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 })
                 .catch((error) => {
                   console.error(error);
@@ -714,10 +840,14 @@ client.on("message", async (message) => {
             message
               .reply('Syntax: "' + config.prefix + 'wsum"!')
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -727,16 +857,25 @@ client.on("message", async (message) => {
           message
             .reply(`Fehler: Nur im <#${config.waffenchannel}> Channel möglich!`)
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -751,8 +890,11 @@ client.on("message", async (message) => {
         message
           .reply('Syntax: "' + config.prefix + 'wdelete"!')
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -774,10 +916,14 @@ client.on("message", async (message) => {
             message
               .reply('Syntax: "' + config.prefix + 'on <Zeit>"!')
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -787,8 +933,14 @@ client.on("message", async (message) => {
           message
             .reply('Syntax: "' + config.prefix + 'on <Zeit>"!')
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
@@ -797,8 +949,11 @@ client.on("message", async (message) => {
             `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
           )
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -817,10 +972,14 @@ client.on("message", async (message) => {
             message
               .reply('Syntax: "' + config.prefix + 'off <Zeit>"!')
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -830,8 +989,14 @@ client.on("message", async (message) => {
           message
             .reply('Syntax: "' + config.prefix + 'off <Zeit>"!')
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
@@ -840,8 +1005,11 @@ client.on("message", async (message) => {
             `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
           )
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -865,12 +1033,14 @@ client.on("message", async (message) => {
                       'Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!'
                     )
                     .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
+                      setTimeout(
+                        () => msg.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
                     });
                 });
             } else {
@@ -881,12 +1051,14 @@ client.on("message", async (message) => {
                     'Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!'
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
+                    setTimeout(
+                      () => message.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               } else {
                 activityOn(message, user, 2);
@@ -908,12 +1080,14 @@ client.on("message", async (message) => {
                           'aon (ID | @User) <Zeit>"!'
                       )
                       .then((msg) => {
-                        msg
-                          .delete({ timeout: config.timeout })
-                          .catch((error) => {});
-                        message
-                          .delete({ timeout: config.timeout })
-                          .catch((error) => {});
+                        setTimeout(
+                          () => msg.delete().catch((error) => {}),
+                          config.timeout
+                        );
+                        setTimeout(
+                          () => message.delete().catch((error) => {}),
+                          config.timeout
+                        );
                       })
                       .catch((error) => {
                         console.error(error);
@@ -927,12 +1101,14 @@ client.on("message", async (message) => {
                       'Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!'
                     )
                     .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
+                      setTimeout(
+                        () => msg.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
                     });
                 } else {
                   activityOn(message, user, 2, args[1]);
@@ -944,10 +1120,14 @@ client.on("message", async (message) => {
                   'Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!'
                 )
                 .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
+                  setTimeout(
+                    () => msg.delete().catch((error) => {}),
+                    config.timeout
+                  );
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 })
                 .catch((error) => {
                   console.error(error);
@@ -957,10 +1137,14 @@ client.on("message", async (message) => {
             message
               .reply('Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!')
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -972,16 +1156,25 @@ client.on("message", async (message) => {
               `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
             )
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -1005,12 +1198,14 @@ client.on("message", async (message) => {
                       'Syntax: "' + config.prefix + 'aoff (ID | @User) <Zeit>"!'
                     )
                     .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
+                      setTimeout(
+                        () => msg.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
                     });
                 });
             } else {
@@ -1021,12 +1216,14 @@ client.on("message", async (message) => {
                     'Syntax: "' + config.prefix + 'aoff (ID | @User) <Zeit>"!'
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
+                    setTimeout(
+                      () => message.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               } else {
                 activityOff(message, user, 2);
@@ -1048,12 +1245,14 @@ client.on("message", async (message) => {
                           'aoff (ID | @User) <Zeit>"!'
                       )
                       .then((msg) => {
-                        msg
-                          .delete({ timeout: config.timeout })
-                          .catch((error) => {});
-                        message
-                          .delete({ timeout: config.timeout })
-                          .catch((error) => {});
+                        setTimeout(
+                          () => msg.delete().catch((error) => {}),
+                          config.timeout
+                        );
+                        setTimeout(
+                          () => message.delete().catch((error) => {}),
+                          config.timeout
+                        );
                       })
                       .catch((error) => {
                         console.error(error);
@@ -1067,12 +1266,14 @@ client.on("message", async (message) => {
                       'Syntax: "' + config.prefix + 'aoff (ID | @User) <Zeit>"!'
                     )
                     .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
+                      setTimeout(
+                        () => msg.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
                     });
                 } else {
                   activityOff(message, user, 2, args[1]);
@@ -1084,10 +1285,14 @@ client.on("message", async (message) => {
                   'Syntax: "' + config.prefix + 'aoff (ID | @User) <Zeit>"!'
                 )
                 .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
+                  setTimeout(
+                    () => msg.delete().catch((error) => {}),
+                    config.timeout
+                  );
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 })
                 .catch((error) => {
                   console.error(error);
@@ -1097,10 +1302,14 @@ client.on("message", async (message) => {
             message
               .reply('Syntax: "' + config.prefix + 'aon (ID | @User) <Zeit>"!')
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -1112,16 +1321,25 @@ client.on("message", async (message) => {
               `Fehler: Nur im <#${config.anwesenheitchannel}> Channel möglich!`
             )
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -1144,12 +1362,14 @@ client.on("message", async (message) => {
                     'Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!'
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
+                    setTimeout(
+                      () => message.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               });
           } else {
@@ -1160,10 +1380,14 @@ client.on("message", async (message) => {
                   'Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!'
                 )
                 .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
+                  setTimeout(
+                    () => msg.delete().catch((error) => {}),
+                    config.timeout
+                  );
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 })
                 .catch((error) => {
                   console.error(error);
@@ -1188,12 +1412,14 @@ client.on("message", async (message) => {
                         'acheck (ID | @User) <Tage>"!'
                     )
                     .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
+                      setTimeout(
+                        () => msg.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
                     });
                 });
             } else {
@@ -1204,12 +1430,14 @@ client.on("message", async (message) => {
                     'Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!'
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
+                    setTimeout(
+                      () => message.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               } else {
                 getActivity(message, user, parseInt(args[1]));
@@ -1221,10 +1449,14 @@ client.on("message", async (message) => {
                 'Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!'
               )
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -1234,16 +1466,25 @@ client.on("message", async (message) => {
           message
             .reply('Syntax: "' + config.prefix + 'acheck (ID | @User) <Tage>"!')
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -1274,21 +1515,24 @@ client.on("message", async (message) => {
             .then(() => {
               if (check === false) {
                 sendAbgabenMessage(message, channel);
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               } else {
                 message
                   .reply(
                     "Fehler: Die Abgabennachricht wurde in dieser Woche bereits gesendet!"
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
+                    setTimeout(
+                      () => message.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               }
             });
@@ -1296,16 +1540,25 @@ client.on("message", async (message) => {
           message
             .reply('Syntax: "' + config.prefix + 'abgabenmessage"!')
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -1331,12 +1584,14 @@ client.on("message", async (message) => {
                         'abgaben (ID | @User) <KW>"!'
                     )
                     .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
+                      setTimeout(
+                        () => msg.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
                     });
                 });
             } else {
@@ -1347,12 +1602,14 @@ client.on("message", async (message) => {
                     'Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!'
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
+                    setTimeout(
+                      () => message.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               } else {
                 toggleAbgaben(message, user, args[1]);
@@ -1364,10 +1621,14 @@ client.on("message", async (message) => {
                 'Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!'
               )
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -1386,12 +1647,14 @@ client.on("message", async (message) => {
                     'Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!'
                   )
                   .then((msg) => {
-                    msg
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => msg.delete().catch((error) => {}),
+                      config.timeout
+                    );
+                    setTimeout(
+                      () => message.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               });
           } else {
@@ -1402,10 +1665,14 @@ client.on("message", async (message) => {
                   'Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!'
                 )
                 .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
+                  setTimeout(
+                    () => msg.delete().catch((error) => {}),
+                    config.timeout
+                  );
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 })
                 .catch((error) => {
                   console.error(error);
@@ -1418,16 +1685,25 @@ client.on("message", async (message) => {
           message
             .reply('Syntax: "' + config.prefix + 'abgaben (ID | @User) <KW>"!')
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -1444,10 +1720,14 @@ client.on("message", async (message) => {
             message
               .reply('Syntax: "' + config.prefix + 'cleanabgaben (KW)"!')
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -1457,16 +1737,25 @@ client.on("message", async (message) => {
           message
             .reply('Syntax: "' + config.prefix + 'cleanabgaben (KW)"!')
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -1493,9 +1782,10 @@ client.on("message", async (message) => {
                     } abgegeben → ${addDots(args[1] * config.preisavv)}$`
                   )
                   .then(() => {
-                    message
-                      .delete({ timeout: config.timeout })
-                      .catch((error) => {});
+                    setTimeout(
+                      () => message.delete().catch((error) => {}),
+                      config.timeout
+                    );
                   });
               } else {
                 const user = message.mentions.users.first();
@@ -1505,12 +1795,14 @@ client.on("message", async (message) => {
                       'Syntax: "' + config.prefix + 'add <ID | @User> <Menge>"!'
                     )
                     .then((msg) => {
-                      msg
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
+                      setTimeout(
+                        () => msg.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
                     });
                 } else {
                   message.channel
@@ -1520,9 +1812,10 @@ client.on("message", async (message) => {
                       } abgegeben → ${addDots(args[1] * config.preisavv)}$`
                     )
                     .then(() => {
-                      message
-                        .delete({ timeout: config.timeout })
-                        .catch((error) => {});
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
                     });
                 }
               }
@@ -1530,10 +1823,14 @@ client.on("message", async (message) => {
               message
                 .reply("Syntax: Das ist keine gültige Menge!")
                 .then((msg) => {
-                  msg.delete({ timeout: config.timeout }).catch((error) => {});
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
+                  setTimeout(
+                    () => msg.delete().catch((error) => {}),
+                    config.timeout
+                  );
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 })
                 .catch((error) => {
                   console.error(error);
@@ -1543,10 +1840,14 @@ client.on("message", async (message) => {
             message
               .reply('Syntax: "' + config.prefix + 'add <ID | @User> <Menge>"!')
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -1556,16 +1857,25 @@ client.on("message", async (message) => {
           message
             .reply(`Fehler: Nur im <#${config.routechannel}> Channel möglich!`)
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -1622,9 +1932,14 @@ client.on("message", async (message) => {
                   )}$**`
                 )
                 .then(() => {
-                  message
-                    .delete({ timeout: config.timeout })
-                    .catch((error) => {});
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
+                  setTimeout(
+                    () => message.delete().catch((error) => {}),
+                    config.timeout
+                  );
                 })
                 .catch((error) => {
                   console.error(error);
@@ -1634,10 +1949,14 @@ client.on("message", async (message) => {
             message
               .reply('Syntax: "' + config.prefix + 'sum"!')
               .then((msg) => {
-                msg.delete({ timeout: config.timeout }).catch((error) => {});
-                message
-                  .delete({ timeout: config.timeout })
-                  .catch((error) => {});
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
               })
               .catch((error) => {
                 console.error(error);
@@ -1647,16 +1966,25 @@ client.on("message", async (message) => {
           message
             .reply(`Fehler: Nur im <#${config.routechannel}> Channel möglich!`)
             .then((msg) => {
-              msg.delete({ timeout: config.timeout }).catch((error) => {});
-              message.delete({ timeout: config.timeout }).catch((error) => {});
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
             });
         }
       } else {
         message
           .reply(`Fehler: Du hast nicht genug Rechte!`)
           .then((msg) => {
-            msg.delete({ timeout: config.timeout }).catch((error) => {});
-            message.delete({ timeout: config.timeout }).catch((error) => {});
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
           })
           .catch((error) => {
             console.error(error);
@@ -1731,7 +2059,7 @@ client.on("message", async (message) => {
         msg + '\n - "' + config.prefix + 'help" um diese Nachricht zu bekommen';
       message.reply(msg).then((msg) => {
         msg.react("🗑️");
-        message.delete({ timeout: config.timeout }).catch((error) => {});
+        setTimeout(() => message.delete().catch((error) => {}), config.timeout);
       });
     } else {
       msg = "Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:";
@@ -1761,7 +2089,7 @@ client.on("message", async (message) => {
         msg + '\n - "' + config.prefix + 'help" um diese Nachricht zu bekommen';
       message.reply(msg).then((msg) => {
         msg.react("🗑️");
-        message.delete({ timeout: config.timeout }).catch((error) => {});
+        setTimeout(() => message.delete().catch((error) => {}), config.timeout);
       });
     }
   }

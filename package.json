@@ -9,8 +9,11 @@
   "author": "uneinqespielt",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/builders": "^0.12.0",
+    "@discordjs/rest": "^0.3.0",
     "discord": "^0.8.2",
-    "discord.js": "^12.5.3",
+    "discord-api-types": "^0.31.0",
+    "discord.js": "^13.6.0",
     "fs": "0.0.1-security",
     "path": "^0.12.7"
   }
