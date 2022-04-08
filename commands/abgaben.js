@@ -1,30 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const { MessageEmbed } = require("discord.js");
 const config = require("../config.json");
-
-// Rollen Check
-function isLeaderschaft(interaction) {
-  if (
-    interaction.member.roles.cache.some(
-      (role) => role.id === config.leaderschaft
-    )
-  ) {
-    return true;
-  }
-  return false;
-}
-
-// Rollen Check
-function isFamilienrat(interaction) {
-  if (
-    interaction.member.roles.cache.some(
-      (role) => role.id === config.familienrat
-    )
-  ) {
-    return true;
-  }
-  return false;
-}
+const functions = require("../functions/functions");
 
 // Abgabenstatus ändern Funktion Interaction
 function toggleAbgaben(interaction, user, kw) {
@@ -91,33 +67,6 @@ function toggleAbgaben(interaction, user, kw) {
   });
 }
 
-// Funktion für die Kalendarwoche
-function getWeekNumber(d) {
-  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-  var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  var weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-  return weekNo;
-}
-
-// Funktion für den Log Channel
-function logEmbed(interaction, title, description) {
-  const embed = new MessageEmbed()
-    .setColor(config.colorhex)
-    .setDescription(title)
-    .setAuthor({
-      name: `${interaction.user.username}#${interaction.user.discriminator}`,
-      iconURL: interaction.user.displayAvatarURL(),
-    })
-    .addFields({ name: "Auswirkung", value: description })
-    .setThumbnail(interaction.guild.iconURL())
-    .setTimestamp()
-    .setFooter({ text: interaction.guild.name });
-
-  let channel = interaction.guild.channels.cache.get(config.logchannel);
-  channel.send({ embeds: [embed] });
-}
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("abgaben")
@@ -140,7 +89,10 @@ module.exports = {
         ephemeral: true,
       });
     } else {
-      if (isLeaderschaft(interaction) || isFamilienrat(interaction)) {
+      if (
+        functions.isLeaderschaft(interaction.member) ||
+        functions.isFamilienrat(interaction.member)
+      ) {
         if (interaction.options.getNumber("kalenderwoche") !== null) {
           if (interaction.options.getNumber("kalenderwoche") == 0) {
             interaction.reply({
@@ -158,7 +110,7 @@ module.exports = {
           toggleAbgaben(
             interaction,
             interaction.options.getUser("familienmitglied"),
-            getWeekNumber(new Date())
+            functions.getWeekNumber(new Date())
           );
         }
       } else {

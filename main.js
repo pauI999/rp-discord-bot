@@ -3,6 +3,7 @@ const fs = require("fs");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const config = require("./config.json");
+const functions = require("./functions/functions");
 
 const client = new Discord.Client({
   intents: [
@@ -13,90 +14,6 @@ const client = new Discord.Client({
     Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
   ],
 });
-
-// Regex der Uhrzeit
-const pattern = new RegExp(/\d{2}:\d{2}/);
-
-// Funktion um zu checken ob String eine Zahl ist
-function isNumeric(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-// Funktion für die Kalendarwoche
-function getWeekNumber(d) {
-  d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-  var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  var weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-  return weekNo;
-}
-
-// Funktion um Punkte bei Zahlen hinzuzufügen
-function addDots(nStr) {
-  nStr += "";
-  x = nStr.split(".");
-  x1 = x[0];
-  x2 = x.length > 1 ? "." + x[1] : "";
-  var rgx = /(\d+)(\d{3})/;
-  while (rgx.test(x1)) {
-    x1 = x1.replace(rgx, "$1" + "." + "$2");
-  }
-  return x1 + x2;
-}
-
-// Rollen Check
-function isLeaderschaft(message) {
-  if (
-    message.member.roles.cache.some((role) => role.id === config.leaderschaft)
-  ) {
-    return true;
-  }
-  return false;
-}
-
-// Rollen Check
-function isFamilienrat(message) {
-  if (
-    message.member.roles.cache.some((role) => role.id === config.familienrat)
-  ) {
-    return true;
-  }
-  return false;
-}
-
-// Rollen Check
-function isLeaderschaft2(user) {
-  if (user.roles.cache.some((role) => role.id === config.leaderschaft)) {
-    return true;
-  }
-  return false;
-}
-
-// Rollen Check
-function isFamilienrat2(user) {
-  if (user.roles.cache.some((role) => role.id === config.familienrat)) {
-    return true;
-  }
-  return false;
-}
-
-// Funktion für den Log Channel
-function logEmbed(member, title, description) {
-  const embed = new Discord.MessageEmbed()
-    .setColor(config.colorhex)
-    .setDescription(title)
-    .setAuthor({
-      name: `${member.user.username}#${member.user.discriminator}`,
-      iconURL: member.user.displayAvatarURL(),
-    })
-    .addFields({ name: "Auswirkung", value: description })
-    .setThumbnail(member.guild.iconURL())
-    .setTimestamp()
-    .setFooter({ text: member.guild.name });
-
-  let channel = member.guild.channels.cache.get(config.logchannel);
-  channel.send({ embeds: [embed] });
-}
 
 // Clean Abgabenliste Funktion
 function cleanAbgaben(message, kw) {
@@ -170,7 +87,7 @@ function toggleAbgaben(message, user, kw) {
                 kassechannel.send(
                   `> + ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
                 );
-                logEmbed(
+                functions.logEmbed(
                   message.member,
                   `Abgaben ${kw} von <@${user.id}> entgegengenommen`,
                   `+ ${config.abgabenstring}`
@@ -180,7 +97,7 @@ function toggleAbgaben(message, user, kw) {
                 kassechannel.send(
                   `> - ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
                 );
-                logEmbed(
+                functions.logEmbed(
                   message.member,
                   `Abgaben ${kw} an <@${user.id}> zurückgegeben`,
                   `- ${config.abgabenstring}`
@@ -217,34 +134,6 @@ function toggleAbgaben(message, user, kw) {
     }
     setTimeout(() => message.delete().catch((error) => {}), config.timeout);
   });
-}
-
-// Abgaben Message Funktion
-function sendAbgabenMessage(message, channel) {
-  var string = [];
-  string.push(
-    `Abgaben (${config.abgabenstring}) - KW **${getWeekNumber(new Date())}**`
-  );
-  message.guild.members.cache
-    .sort(function (a, b) {
-      if (a.displayName < b.displayName) {
-        return 1;
-      }
-      if (a.displayName > b.displayName) {
-        return -1;
-      }
-      return 0;
-    })
-    .each((member) => {
-      if (member.roles.cache.some((role) => role.id === config.familie)) {
-        if (
-          !member.roles.cache.some((role) => role.id === config.leaderschaft)
-        ) {
-          string.push(`\n - ${member} - :x:`);
-        }
-      }
-    });
-  channel.send(string.join(""));
 }
 
 // Delete Last Command
@@ -653,7 +542,7 @@ client.on("messageCreate", async (message) => {
             let error = false;
             for (let i = 0; i < args.length; i = i + 2) {
               if (waffen.has(args[i].toLocaleLowerCase())) {
-                if (isNumeric(args[i + 1])) {
+                if (functions.isNumeric(args[i + 1])) {
                   weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
                 } else {
                   error = true;
@@ -767,7 +656,10 @@ client.on("messageCreate", async (message) => {
     }
     // Waffenverkauf Zusammenfassen Command
     else if (command === "wsum") {
-      if (isLeaderschaft(message) || isFamilienrat(message)) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
         if (message.channel.id == config.waffenchannel) {
           if (args.length === 0) {
             let cut = false;
@@ -821,8 +713,10 @@ client.on("messageCreate", async (message) => {
                 preis = preis + element * waffen.get(index);
               });
 
-              messagestring = `${messagestring}\nPreis: **${addDots(preis)}$**`;
-              messagestring = `${messagestring}\nLangwaffen: **${addDots(
+              messagestring = `${messagestring}\nPreis: **${functions.addDots(
+                preis
+              )}$**`;
+              messagestring = `${messagestring}\nLangwaffen: **${functions.addDots(
                 langwaffen
               )}**`;
               message.channel
@@ -911,7 +805,7 @@ client.on("messageCreate", async (message) => {
         if (args.length === 0) {
           activityOn(message, message.author, 1);
         } else if (args.length === 1) {
-          if (args[0].match(pattern)) {
+          if (args[0].match(functions.pattern)) {
             activityOn(message, message.author, 1, args[0]);
           } else {
             message
@@ -967,7 +861,7 @@ client.on("messageCreate", async (message) => {
         if (args.length === 0) {
           activityOff(message, message.author, 1);
         } else if (args.length === 1) {
-          if (args[0].match(pattern)) {
+          if (args[0].match(functions.pattern)) {
             activityOff(message, message.author, 1, args[0]);
           } else {
             message
@@ -1019,10 +913,13 @@ client.on("messageCreate", async (message) => {
     }
     // Andere User Online stellen Command
     else if (command === "aon") {
-      if (isLeaderschaft(message) || isFamilienrat(message)) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
         if (message.channel.id == config.anwesenheitchannel) {
           if (args.length === 1) {
-            if (isNumeric(args[0])) {
+            if (functions.isNumeric(args[0])) {
               await client.users
                 .fetch(args[0])
                 .then((user) => {
@@ -1066,8 +963,8 @@ client.on("messageCreate", async (message) => {
               }
             }
           } else if (args.length === 2) {
-            if (args[1].match(pattern)) {
-              if (isNumeric(args[0])) {
+            if (args[1].match(functions.pattern)) {
+              if (functions.isNumeric(args[0])) {
                 await client.users
                   .fetch(args[0])
                   .then((user) => {
@@ -1184,10 +1081,13 @@ client.on("messageCreate", async (message) => {
     }
     // Andere User Offline stellen Command
     else if (command === "aoff") {
-      if (isLeaderschaft(message) || isFamilienrat(message)) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
         if (message.channel.id == config.anwesenheitchannel) {
           if (args.length === 1) {
-            if (isNumeric(args[0])) {
+            if (functions.isNumeric(args[0])) {
               await client.users
                 .fetch(args[0])
                 .then((user) => {
@@ -1231,8 +1131,8 @@ client.on("messageCreate", async (message) => {
               }
             }
           } else if (args.length === 2) {
-            if (args[1].match(pattern)) {
-              if (isNumeric(args[0])) {
+            if (args[1].match(functions.pattern)) {
+              if (functions.isNumeric(args[0])) {
                 await client.users
                   .fetch(args[0])
                   .then((user) => {
@@ -1349,9 +1249,12 @@ client.on("messageCreate", async (message) => {
     }
     // Aktivität Zusammenfassen Command
     else if (command === "acheck") {
-      if (isLeaderschaft(message) || isFamilienrat(message)) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
         if (args.length === 1) {
-          if (isNumeric(args[0])) {
+          if (functions.isNumeric(args[0])) {
             await client.users
               .fetch(args[0])
               .then((user) => {
@@ -1398,8 +1301,8 @@ client.on("messageCreate", async (message) => {
             }
           }
         } else if (args.length === 2) {
-          if (isNumeric(args[1])) {
-            if (isNumeric(args[0])) {
+          if (functions.isNumeric(args[1])) {
+            if (functions.isNumeric(args[0])) {
               await client.users
                 .fetch(args[0])
                 .then((user) => {
@@ -1498,7 +1401,10 @@ client.on("messageCreate", async (message) => {
   if (config.abgabenchannel !== "0") {
     // Abgaben Nachricht erzeugen Command
     if (command === "abgabenmessage") {
-      if (isLeaderschaft(message) || isFamilienrat(message)) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
         if (args.length === 0) {
           let check = false;
           let channel = message.guild.channels.cache.get(config.abgabenchannel);
@@ -1507,7 +1413,9 @@ client.on("messageCreate", async (message) => {
             .then((messages) => {
               messages.each((smessage) => {
                 if (
-                  smessage.content.includes(`**${getWeekNumber(new Date())}**`)
+                  smessage.content.includes(
+                    `**${functions.getWeekNumber(new Date())}**`
+                  )
                 ) {
                   check = true;
                 }
@@ -1515,7 +1423,7 @@ client.on("messageCreate", async (message) => {
             })
             .then(() => {
               if (check === false) {
-                sendAbgabenMessage(message, channel);
+                functions.sendAbgabenMessage(message, channel);
                 setTimeout(
                   () => message.delete().catch((error) => {}),
                   config.timeout
@@ -1568,10 +1476,13 @@ client.on("messageCreate", async (message) => {
     }
     // Abgabenstatus ändern Command
     else if (command === "abgaben") {
-      if (isLeaderschaft(message) || isFamilienrat(message)) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
         if (args.length == 2) {
-          if (isNumeric(args[1])) {
-            if (isNumeric(args[0])) {
+          if (functions.isNumeric(args[1])) {
+            if (functions.isNumeric(args[0])) {
               await client.users
                 .fetch(args[0])
                 .then((user) => {
@@ -1636,11 +1547,15 @@ client.on("messageCreate", async (message) => {
               });
           }
         } else if (args.length == 1) {
-          if (isNumeric(args[0])) {
+          if (functions.isNumeric(args[0])) {
             await client.users
               .fetch(args[0])
               .then((user) => {
-                toggleAbgaben(message, user, getWeekNumber(new Date()));
+                toggleAbgaben(
+                  message,
+                  user,
+                  functions.getWeekNumber(new Date())
+                );
               })
               .catch(() => {
                 message
@@ -1679,7 +1594,7 @@ client.on("messageCreate", async (message) => {
                   console.error(error);
                 });
             } else {
-              toggleAbgaben(message, user, getWeekNumber(new Date()));
+              toggleAbgaben(message, user, functions.getWeekNumber(new Date()));
             }
           }
         } else {
@@ -1713,9 +1628,12 @@ client.on("messageCreate", async (message) => {
     }
     // Clean Abgaben Command
     else if (command === "cleanabgaben") {
-      if (isLeaderschaft(message) || isFamilienrat(message)) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
         if (args.length === 1) {
-          if (isNumeric(args[0])) {
+          if (functions.isNumeric(args[0])) {
             cleanAbgaben(message, args[0]);
           } else {
             message
@@ -1768,19 +1686,24 @@ client.on("messageCreate", async (message) => {
   if (config.routechannel !== "0") {
     // Verkauf Hinzufügen Command
     if (command === "add") {
-      if (isLeaderschaft(message) || isFamilienrat(message)) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
         if (message.channel.id == config.routechannel) {
           if (args.length == 2) {
-            if (isNumeric(args[1])) {
-              if (isNumeric(args[0])) {
+            if (functions.isNumeric(args[1])) {
+              if (functions.isNumeric(args[0])) {
                 const user = await client.users
                   .fetch(args[0])
                   .catch(console.error);
                 message.channel
                   .send(
-                    `${user} hat ${addDots(args[1])} ${
+                    `${user} hat ${functions.addDots(args[1])} ${
                       config.droge
-                    } abgegeben → ${addDots(args[1] * config.preisavv)}$`
+                    } abgegeben → ${functions.addDots(
+                      args[1] * config.preisavv
+                    )}$`
                   )
                   .then(() => {
                     setTimeout(
@@ -1808,9 +1731,11 @@ client.on("messageCreate", async (message) => {
                 } else {
                   message.channel
                     .send(
-                      `${user} hat ${addDots(args[1])} ${
+                      `${user} hat ${functions.addDots(args[1])} ${
                         config.droge
-                      } abgegeben → ${addDots(args[1] * config.preisavv)}$`
+                      } abgegeben → ${functions.addDots(
+                        args[1] * config.preisavv
+                      )}$`
                     )
                     .then(() => {
                       setTimeout(
@@ -1885,7 +1810,10 @@ client.on("messageCreate", async (message) => {
     }
     // Verkauf Zusammenfassen Command
     else if (command === "sum") {
-      if (isLeaderschaft(message) || isFamilienrat(message)) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
         if (message.channel.id == config.routechannel) {
           if (args.length === 0) {
             let cut = false;
@@ -1911,23 +1839,23 @@ client.on("messageCreate", async (message) => {
                 " Minuten";
               message.channel
                 /*.send(
-                `Insgesamt: ${addDots(amount)} ${
+                `Insgesamt: ${functions.addDots(amount)} ${
                   config.droge
-                } → Schwarz: **${addDots(amount * config.preiss)}$**,
-                Grün: **${addDots(
+                } → Schwarz: **${functions.addDots(amount * config.preiss)}$**,
+                Grün: **${functions.addDots(
                   amount * config.preisg
-                )}$**, davon Geld an Verkäufer: **${addDots(
+                )}$**, davon Geld an Verkäufer: **${functions.addDots(
                   amount * config.preisg - amount * config.preisavv
                 )}$**``, Zeit: **${timestring}**`
               )*/
                 .send(
-                  `Insgesamt: ${addDots(amount)} ${
+                  `Insgesamt: ${functions.addDots(amount)} ${
                     config.droge
-                  } → Grün: **${addDots(
+                  } → Grün: **${functions.addDots(
                     amount * config.preisg
-                  )}$**, davon Geld an Leaderschaft: **${addDots(
+                  )}$**, davon Geld an Leaderschaft: **${functions.addDots(
                     amount * config.preisg - amount * config.preisavv
-                  )}$** ➜ Anteil pro Leaderschafter: **${addDots(
+                  )}$** ➜ Anteil pro Leaderschafter: **${functions.addDots(
                     (amount * config.preisg - amount * config.preisavv) /
                       config.leaderschafter
                   )}$**`
@@ -1995,7 +1923,10 @@ client.on("messageCreate", async (message) => {
   }
   // Help Command
   if (command === "help") {
-    if (isLeaderschaft(message) || isFamilienrat(message)) {
+    if (
+      functions.isLeaderschaft(message.member) ||
+      functions.isFamilienrat(message.member)
+    ) {
       msg = "Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:";
       if (config.anwesenheitchannel !== "0") {
         msg =
@@ -2103,9 +2034,9 @@ client.on("messageReactionAdd", async (reaction, user) => {
   if (reaction.emoji.name === "🗑️") {
     if (reaction.message.partial) await reaction.message.fetch();
     const member = reaction.message.guild.members.cache.get(user.id);
-    if (isLeaderschaft2(member)) {
+    if (functions.isLeaderschaft(member)) {
       reaction.message.delete().catch((error) => {});
-    } else if (isFamilienrat2(member)) {
+    } else if (functions.isFamilienrat(member)) {
       reaction.message.delete().catch((error) => {});
     } else if (reaction.message.content.includes(member)) {
       reaction.message.delete().catch((error) => {});
@@ -2122,7 +2053,10 @@ client.on("messageReactionAdd", async (reaction, user) => {
       const member = reaction.message.mentions.users.first();
       if (member !== undefined) {
         const member2 = reaction.message.guild.members.cache.get(user.id);
-        if (isLeaderschaft2(member2) || isFamilienrat2(member2)) {
+        if (
+          functions.isLeaderschaft(member2) ||
+          functions.isFamilienrat(member2)
+        ) {
           let kassechannel = reaction.message.guild.channels.cache.get(
             config.kassechannel
           );
@@ -2131,14 +2065,14 @@ client.on("messageReactionAdd", async (reaction, user) => {
               reaction.message.content.split(/ +/)[2].split(".").join("")
             ) * config.preisavv;
           kassechannel.send(
-            `> - ${addDots(amount)}$ ${
+            `> - ${functions.addDots(amount)}$ ${
               config.droge
             } Verkauf Rückzahlung - ${member}`
           );
-          logEmbed(
+          functions.logEmbed(
             member2,
             `${config.droge} Verkauf an ${member} ausgezahlt`,
-            ` - ${addDots(amount)}$`
+            ` - ${functions.addDots(amount)}$`
           );
         }
       }
@@ -2154,7 +2088,10 @@ client.on("messageReactionAdd", async (reaction, user) => {
     if (reaction.message.channel.id === config.routechannel) {
       if (reaction.message.content.includes("Insgesamt:")) {
         const member2 = reaction.message.guild.members.cache.get(user.id);
-        if (isLeaderschaft2(member2) || isFamilienrat2(member2)) {
+        if (
+          functions.isLeaderschaft(member2) ||
+          functions.isFamilienrat(member2)
+        ) {
           let amount = reaction.message.content
             .split(" ")[1]
             .split(".")
@@ -2163,14 +2100,14 @@ client.on("messageReactionAdd", async (reaction, user) => {
             config.kassechannel
           );
           kassechannel.send(
-            `> + ${addDots(parseInt(amount) * config.preisavv)}$ ${
+            `> + ${functions.addDots(parseInt(amount) * config.preisavv)}$ ${
               config.droge
             } Verkauf`
           );
-          logEmbed(
+          functions.logEmbed(
             member2,
             `${config.droge} Verkauf Einzahlung`,
-            `+ ${addDots(parseInt(amount) * config.preisavv)}$`
+            `+ ${functions.addDots(parseInt(amount) * config.preisavv)}$`
           );
         }
       }
@@ -2186,7 +2123,10 @@ client.on("messageReactionAdd", async (reaction, user) => {
     if (reaction.message.channel.id === config.waffenchannel) {
       if (reaction.message.content.includes("**Insgesamt:**")) {
         const member2 = reaction.message.guild.members.cache.get(user.id);
-        if (isLeaderschaft2(member2) || isFamilienrat2(member2)) {
+        if (
+          functions.isLeaderschaft(member2) ||
+          functions.isFamilienrat(member2)
+        ) {
           let messagestring = reaction.message.content.split("\n");
           let preis = messagestring[messagestring.length - 2]
             .split(" ")[1]
@@ -2198,12 +2138,12 @@ client.on("messageReactionAdd", async (reaction, user) => {
             config.kassechannel
           );
           kassechannel.send(
-            `> - ${addDots(parseInt(preis))}$ Waffenbestellung`
+            `> - ${functions.addDots(parseInt(preis))}$ Waffenbestellung`
           );
-          logEmbed(
+          functions.logEmbed(
             member2,
             `Waffenbestellung bezahlt`,
-            `- ${addDots(parseInt(preis))}$`
+            `- ${functions.addDots(parseInt(preis))}$`
           );
         }
       }
@@ -2221,7 +2161,10 @@ client.on("messageReactionAdd", async (reaction, user) => {
       const member = reaction.message.mentions.users.first();
       if (member !== undefined) {
         const member2 = reaction.message.guild.members.cache.get(user.id);
-        if (isLeaderschaft2(member2) || isFamilienrat2(member2)) {
+        if (
+          functions.isLeaderschaft(member2) ||
+          functions.isFamilienrat(member2)
+        ) {
           let messagestring = reaction.message.content.split("\n");
           messagestring.shift();
           messagestring.shift();
@@ -2239,12 +2182,12 @@ client.on("messageReactionAdd", async (reaction, user) => {
             config.kassechannel
           );
           kassechannel.send(
-            `> + ${addDots(amount)}$ Waffenbestellung - ${member}`
+            `> + ${functions.addDots(amount)}$ Waffenbestellung - ${member}`
           );
-          logEmbed(
+          functions.logEmbed(
             member2,
             `Waffenbestellung von ${member} entgegengenommen`,
-            `+ ${addDots(amount)}$`
+            `+ ${functions.addDots(amount)}$`
           );
         }
       }
