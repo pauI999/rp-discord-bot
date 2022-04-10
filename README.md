@@ -2,6 +2,8 @@
 
 {
   "token": "discordtoken",
+  "status": false,
+  "guildID": "791333969119281172",
   "startmessage": "...-Bot ist online!",
   "prefix": "prefix",
   "colorhex": "#fff",
