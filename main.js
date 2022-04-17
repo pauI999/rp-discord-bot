@@ -219,18 +219,13 @@ async function lots_of_messages_getter(channel, limit = 500, time = 30) {
       break;
     }
   }
+  const final_messages = [];
 
-  return sum_messages;
-
-  /*const filter = (m) => m.author.bot;
-  const collector = channel.createMessageCollector({
-    filter,
-    time: 1000 * time,
+  sum_messages.forEach((summessage) => {
+    final_messages.push(summessage[1]);
   });
-  collector.on("end", (collected) => {
-    console.log(`Collected ${collected.size} items`);
-    return collected;
-  });*/
+
+  return final_messages;
 }
 
 // Aktivität Check Funktion
