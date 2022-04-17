@@ -201,7 +201,7 @@ async function deletelast(message) {
 
 // Aktivität Help Funktion
 
-async function lots_of_messages_getter(channel, limit = 500) {
+async function lots_of_messages_getter(channel, limit = 500, time = 30) {
   /* const sum_messages = [];
   let last_id;
 
@@ -223,7 +223,10 @@ async function lots_of_messages_getter(channel, limit = 500) {
   return sum_messages;*/
 
   const filter = (m) => m.author.bot;
-  const collector = channel.createMessageCollector({ filter, time: 1000 * 30 });
+  const collector = channel.createMessageCollector({
+    filter,
+    time: 1000 * time,
+  });
   collector.on("end", (collected) => {
     console.log(`Collected ${collected.size} items`);
     return collected;
@@ -241,25 +244,27 @@ async function getActivity(message, user, days) {
   let timeminutes = 0;
   days = typeof days === "undefined" ? config.activitycheckdaysdefault : days;
 
-  (await lots_of_messages_getter(channel, 700)).forEach(async (smessage) => {
-    if (cut === false) {
-      if (smessage.partial) await smessage.fetch();
-      if (smessage.content.includes(user)) {
-        if (
-          Date.now() - smessage.createdTimestamp >
-          1000 * 60 * 60 * 24 * days
-        ) {
-          cut = true;
-        } else {
+  (await lots_of_messages_getter(channel, 700, 30)).forEach(
+    async (smessage) => {
+      if (cut === false) {
+        if (smessage.partial) await smessage.fetch();
+        if (smessage.content.includes(user)) {
           if (
-            smessage.content.includes("Offline:") &&
-            smessage.content.includes("Online:")
-          )
-            itmessages.push(smessage);
+            Date.now() - smessage.createdTimestamp >
+            1000 * 60 * 60 * 24 * days
+          ) {
+            cut = true;
+          } else {
+            if (
+              smessage.content.includes("Offline:") &&
+              smessage.content.includes("Online:")
+            )
+              itmessages.push(smessage);
+          }
         }
       }
     }
-  });
+  );
   itmessages.forEach((smessage) => {
     var ontime = smessage.content.split(" ")[2].split("\n")[0];
     var offtime = smessage.content.split(" ").pop();
