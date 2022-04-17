@@ -237,18 +237,20 @@ async function getActivity(message, user, days) {
   (await lots_of_messages_getter(channel, 700)).forEach(async (smessage) => {
     if (cut === false) {
       if (smessage.partial) await smessage.fetch();
-      if (smessage.content.includes(user)) {
-        if (
-          Date.now() - smessage.createdTimestamp >
-          1000 * 60 * 60 * 24 * days
-        ) {
-          cut = true;
-        } else {
+      if (smessage.content) {
+        if (smessage.content.includes(user)) {
           if (
-            smessage.content.includes("Offline:") &&
-            smessage.content.includes("Online:")
-          )
-            itmessages.push(smessage);
+            Date.now() - smessage.createdTimestamp >
+            1000 * 60 * 60 * 24 * days
+          ) {
+            cut = true;
+          } else {
+            if (
+              smessage.content.includes("Offline:") &&
+              smessage.content.includes("Online:")
+            )
+              itmessages.push(smessage);
+          }
         }
       }
     }
