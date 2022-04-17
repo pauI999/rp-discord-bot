@@ -237,24 +237,24 @@ async function getActivity(message, user, days) {
   (await lots_of_messages_getter(channel, 700)).forEach(async (ssmessage) => {
     if (cut === false) {
       if (!ssmessage.messageDelete) {
-        if (ssmessage.partial) {
-          await ssmessage.fetch().then((smessage) => {
-            if (smessage.content.includes(user)) {
+        //if (ssmessage.partial) {
+        await ssmessage.fetch().then((smessage) => {
+          if (smessage.content.includes(user)) {
+            if (
+              Date.now() - smessage.createdTimestamp >
+              1000 * 60 * 60 * 24 * days
+            ) {
+              cut = true;
+            } else {
               if (
-                Date.now() - smessage.createdTimestamp >
-                1000 * 60 * 60 * 24 * days
-              ) {
-                cut = true;
-              } else {
-                if (
-                  smessage.content.includes("Offline:") &&
-                  smessage.content.includes("Online:")
-                )
-                  itmessages.push(smessage);
-              }
+                smessage.content.includes("Offline:") &&
+                smessage.content.includes("Online:")
+              )
+                itmessages.push(smessage);
             }
-          });
-        } else {
+          }
+        });
+        /* } else {
           if (ssmessage.content.includes(user)) {
             if (
               Date.now() - ssmessage.createdTimestamp >
@@ -269,7 +269,7 @@ async function getActivity(message, user, days) {
                 itmessages.push(ssmessage);
             }
           }
-        }
+        }*/
       }
     }
   });
