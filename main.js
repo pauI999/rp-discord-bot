@@ -236,7 +236,7 @@ async function getActivity(message, user, days) {
 
   (await lots_of_messages_getter(channel, 700)).forEach(async (ssmessage) => {
     if (cut === false) {
-      if (message.partial) {
+      if (ssmessage.partial) {
         await ssmessage.fetch().then((smessage) => {
           if (smessage.content.includes(user)) {
             if (
