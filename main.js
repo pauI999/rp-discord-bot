@@ -234,21 +234,39 @@ async function getActivity(message, user, days) {
   let timeminutes = 0;
   days = typeof days === "undefined" ? config.activitycheckdaysdefault : days;
 
-  (await lots_of_messages_getter(channel, 700)).forEach(async (smessage) => {
+  (await lots_of_messages_getter(channel, 700)).forEach(async (ssmessage) => {
     if (cut === false) {
-      await smessage.fetch();
-      if (smessage.content.includes(user)) {
-        if (
-          Date.now() - smessage.createdTimestamp >
-          1000 * 60 * 60 * 24 * days
-        ) {
-          cut = true;
-        } else {
+      if (message.partial) {
+        await ssmessage.fetch().then((smessage) => {
+          if (smessage.content.includes(user)) {
+            if (
+              Date.now() - smessage.createdTimestamp >
+              1000 * 60 * 60 * 24 * days
+            ) {
+              cut = true;
+            } else {
+              if (
+                smessage.content.includes("Offline:") &&
+                smessage.content.includes("Online:")
+              )
+                itmessages.push(smessage);
+            }
+          }
+        });
+      } else {
+        if (ssmessage.content.includes(user)) {
           if (
-            smessage.content.includes("Offline:") &&
-            smessage.content.includes("Online:")
-          )
-            itmessages.push(smessage);
+            Date.now() - ssmessage.createdTimestamp >
+            1000 * 60 * 60 * 24 * days
+          ) {
+            cut = true;
+          } else {
+            if (
+              ssmessage.content.includes("Offline:") &&
+              ssmessage.content.includes("Online:")
+            )
+              itmessages.push(ssmessage);
+          }
         }
       }
     }
