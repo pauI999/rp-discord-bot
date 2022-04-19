@@ -11,36 +11,28 @@ module.exports = {
       functions.isFamilienrat(interaction.member)
     ) {
       if (config.waffenchannel != "0") {
-        if (!interaction.message.author.bot) {
-          if (interaction.message.channel.id === config.waffenchannel) {
-            const member = interaction.message.mentions.users.first();
+        if (msg.author.bot) {
+          if (msg.channel.id === config.waffenchannel) {
+            const member = msg.mentions.users.first();
             if (member !== undefined) {
-              const member2 = interaction.message.guild.members.cache.get(
-                user.id
-              );
-              if (
-                functions.isLeaderschaft(member2) ||
-                functions.isFamilienrat(member2)
-              ) {
-                let messagestring = msg.content.split("\n");
-                messagestring.shift();
-                messagestring.shift();
-                let weapons = new Map();
-                messagestring.forEach((part) => {
-                  let parts = part.split(" ");
-                  weapons.set(parts[1], parts[0].slice(0, -1));
-                });
-                let amount = 0;
-                let waffen = new Map(Object.entries(config.waffen));
-                weapons.forEach((element, index) => {
-                  amount = amount + element * waffen.get(index);
-                });
+              let messagestring = msg.content.split("\n");
+              messagestring.shift();
+              messagestring.shift();
+              let weapons = new Map();
+              messagestring.forEach((part) => {
+                let parts = part.split(" ");
+                weapons.set(parts[1], parts[0].slice(0, -1));
+              });
+              let amount = 0;
+              let waffen = new Map(Object.entries(config.waffen));
+              weapons.forEach((element, index) => {
+                amount = amount + element * waffen.get(index);
+              });
 
-                interaction.reply({
-                  content: "Preis: " + functions.addDots(amount) + "$",
-                  ephemeral: true,
-                });
-              }
+              interaction.reply({
+                content: "Preis: " + functions.addDots(amount) + "$",
+                ephemeral: true,
+              });
             }
           } else {
             interaction.reply({
