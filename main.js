@@ -71,7 +71,10 @@ function cleanAbgaben(message, kw) {
 // Abgabenstatus ändern Funktion
 function toggleAbgaben(message, user, kw) {
   let channel = message.guild.channels.cache.get(config.abgabenchannel);
-  let kassechannel = message.guild.channels.cache.get(config.kassechannel);
+  let kassechannel;
+  if (config.kassechannel !== "0") {
+    kassechannel = message.guild.channels.cache.get(config.kassechannel);
+  }
   let done = false;
   channel.messages.fetch({ limit: 6 }).then((messages) => {
     messages.each((smessage) => {
@@ -84,9 +87,11 @@ function toggleAbgaben(message, user, kw) {
             if (teil.includes(user.id)) {
               if (teil.includes(":x:")) {
                 teil = ` - <@${user.id}> - :white_check_mark:`;
-                kassechannel.send(
-                  `> + ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
-                );
+                if (config.kassechannel !== "0") {
+                  kassechannel.send(
+                    `> + ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                  );
+                }
                 functions.logEmbed(
                   message.member,
                   `Abgaben ${kw} von <@${user.id}> entgegengenommen`,
@@ -94,9 +99,11 @@ function toggleAbgaben(message, user, kw) {
                 );
               } else {
                 teil = ` - <@${user.id}> - :x:`;
-                kassechannel.send(
-                  `> - ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
-                );
+                if (config.kassechannel !== "0") {
+                  kassechannel.send(
+                    `> - ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                  );
+                }
                 functions.logEmbed(
                   message.member,
                   `Abgaben ${kw} an <@${user.id}> zurückgegeben`,
@@ -2064,18 +2071,20 @@ client.on("messageReactionAdd", async (reaction, user) => {
           functions.isLeaderschaft(member2) ||
           functions.isFamilienrat(member2)
         ) {
-          let kassechannel = reaction.message.guild.channels.cache.get(
-            config.kassechannel
-          );
           let amount =
             parseInt(
               reaction.message.content.split(/ +/)[2].split(".").join("")
             ) * config.preisavv;
-          kassechannel.send(
-            `> - ${functions.addDots(amount)}$ ${
-              config.droge
-            } Verkauf Rückzahlung - ${member}`
-          );
+          if (config.kassechannel !== "0") {
+            let kassechannel = reaction.message.guild.channels.cache.get(
+              config.kassechannel
+            );
+            kassechannel.send(
+              `> - ${functions.addDots(amount)}$ ${
+                config.droge
+              } Verkauf Rückzahlung - ${member}`
+            );
+          }
           functions.logEmbed(
             member2,
             `${config.droge} Verkauf an ${member} ausgezahlt`,
@@ -2103,14 +2112,16 @@ client.on("messageReactionAdd", async (reaction, user) => {
             .split(" ")[1]
             .split(".")
             .join("");
-          let kassechannel = reaction.message.guild.channels.cache.get(
-            config.kassechannel
-          );
-          kassechannel.send(
-            `> + ${functions.addDots(parseInt(amount) * config.preisavv)}$ ${
-              config.droge
-            } Verkauf`
-          );
+          if (config.kassechannel !== "0") {
+            let kassechannel = reaction.message.guild.channels.cache.get(
+              config.kassechannel
+            );
+            kassechannel.send(
+              `> + ${functions.addDots(parseInt(amount) * config.preisavv)}$ ${
+                config.droge
+              } Verkauf`
+            );
+          }
           functions.logEmbed(
             member2,
             `${config.droge} Verkauf Einzahlung`,
@@ -2141,12 +2152,14 @@ client.on("messageReactionAdd", async (reaction, user) => {
             .substring(2)
             .split(".")
             .join("");
-          let kassechannel = reaction.message.guild.channels.cache.get(
-            config.kassechannel
-          );
-          kassechannel.send(
-            `> - ${functions.addDots(parseInt(preis))}$ Waffenbestellung`
-          );
+          if (config.kassechannel !== "0") {
+            let kassechannel = reaction.message.guild.channels.cache.get(
+              config.kassechannel
+            );
+            kassechannel.send(
+              `> - ${functions.addDots(parseInt(preis))}$ Waffenbestellung`
+            );
+          }
           functions.logEmbed(
             member2,
             `Waffenbestellung bezahlt`,
@@ -2185,12 +2198,14 @@ client.on("messageReactionAdd", async (reaction, user) => {
           weapons.forEach((element, index) => {
             amount = amount + element * waffen.get(index);
           });
-          let kassechannel = reaction.message.guild.channels.cache.get(
-            config.kassechannel
-          );
-          kassechannel.send(
-            `> + ${functions.addDots(amount)}$ Waffenbestellung - ${member}`
-          );
+          if (config.kassechannel !== "0") {
+            let kassechannel = reaction.message.guild.channels.cache.get(
+              config.kassechannel
+            );
+            kassechannel.send(
+              `> + ${functions.addDots(amount)}$ Waffenbestellung - ${member}`
+            );
+          }
           functions.logEmbed(
             member2,
             `Waffenbestellung von ${member} entgegengenommen`,

@@ -5,7 +5,10 @@ const functions = require("../functions/functions");
 // Abgabenstatus ändern Funktion Interaction
 function toggleAbgaben(interaction, user, kw) {
   let channel = interaction.guild.channels.cache.get(config.abgabenchannel);
-  let kassechannel = interaction.guild.channels.cache.get(config.kassechannel);
+  let kassechannel;
+  if (config.kassechannel !== "0") {
+    kassechannel = interaction.guild.channels.cache.get(config.kassechannel);
+  }
   let done = false;
   channel.messages.fetch({ limit: 6 }).then((messages) => {
     messages.each((smessage) => {
@@ -18,9 +21,11 @@ function toggleAbgaben(interaction, user, kw) {
             if (teil.includes(user.id)) {
               if (teil.includes(":x:")) {
                 teil = ` - <@${user.id}> - :white_check_mark:`;
-                kassechannel.send(
-                  `> + ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
-                );
+                if (config.kassechannel !== "0") {
+                  kassechannel.send(
+                    `> + ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                  );
+                }
                 logEmbed(
                   interaction.member,
                   `Abgaben ${kw} von <@${user.id}> entgegengenommen`,
@@ -28,9 +33,11 @@ function toggleAbgaben(interaction, user, kw) {
                 );
               } else {
                 teil = ` - <@${user.id}> - :x:`;
-                kassechannel.send(
-                  `> - ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
-                );
+                if (config.kassechannel !== "0") {
+                  kassechannel.send(
+                    `> - ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                  );
+                }
                 logEmbed(
                   interaction.member,
                   `Abgaben ${kw} an <@${user.id}> zurückgegeben`,
