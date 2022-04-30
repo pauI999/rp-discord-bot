@@ -54,19 +54,21 @@ module.exports = {
                     embed.description.includes("Waffenbestellung") &&
                     embed.description.includes("entgegengenommen")
                   ) {
-                    if (map.has(embed.author.name)) {
+                    let id = embed.author.name.split(" ");
+                    id = embed.author.name.split(" ")[id.lenght - 1];
+                    if (map.has(id)) {
                       let newpreis =
-                        parseInt(map.get(embed.author.name)) +
+                        parseInt(map.get(id)) +
                         parseInt(
                           embed.fields[0].value
                             .substring(2)
                             .slice(0, -1)
                             .replaceAll(".", "")
                         );
-                      map.set(embed.author.name, newpreis);
+                      map.set(id, newpreis);
                     } else {
                       map.set(
-                        embed.author.name,
+                        id,
                         parseInt(
                           embed.fields[0].value
                             .substring(2)
@@ -83,7 +85,7 @@ module.exports = {
           let replystring = "Liste:";
           map.forEach((v, k) => {
             replystring =
-              replystring + "\n@" + k + " → " + functions.addDots(v) + "$";
+              replystring + "\n<@" + k + "> → " + functions.addDots(v) + "$";
           });
           interaction.reply({
             content: replystring,

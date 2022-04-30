@@ -81,7 +81,7 @@ function logEmbed(member, title, description) {
     .setColor(config.colorhex)
     .setDescription(title)
     .setAuthor({
-      name: `${member.user.username}#${member.user.discriminator}`,
+      name: `${member.user.username}#${member.user.discriminator} | ${member.id}`,
       iconURL: member.user.displayAvatarURL(),
     })
     .addFields({ name: "Auswirkung", value: description })
