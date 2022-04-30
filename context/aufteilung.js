@@ -41,11 +41,16 @@ module.exports = {
     const msg = await interaction.channel.messages.fetch(interaction.targetId);
 
     if (config.waffenchannel != "0") {
-      if (msg.author.bot) {
-        if (msg.channel.id === config.logchannel) {
-          const map = new Map();
-          (await lots_of_messages_getter2(interaction.channel, msg.id)).forEach(
-            async (smessage) => {
+      if (
+        functions.isLeaderschaft(interaction.member) ||
+        functions.isFamilienrat(interaction.member)
+      ) {
+        if (msg.author.bot) {
+          if (msg.channel.id === config.logchannel) {
+            const map = new Map();
+            (
+              await lots_of_messages_getter2(interaction.channel, msg.id)
+            ).forEach(async (smessage) => {
               if (smessage.partial) await smessage.fetch();
               if (smessage.author.bot) {
                 if (smessage.embeds.length == 1) {
@@ -79,26 +84,31 @@ module.exports = {
                   }
                 }
               }
-            }
-          );
-          let replystring = "Liste:";
-          map.forEach((v, k) => {
-            replystring =
-              replystring + "\n<@" + k + "> → " + functions.addDots(v) + "$";
-          });
-          interaction.reply({
-            content: replystring,
-            ephemeral: false,
-          });
+            });
+            let replystring = "Liste:";
+            map.forEach((v, k) => {
+              replystring =
+                replystring + "\n<@" + k + "> → " + functions.addDots(v) + "$";
+            });
+            interaction.reply({
+              content: replystring,
+              ephemeral: false,
+            });
+          } else {
+            interaction.reply({
+              content: "Fehler: Das geht nur im Log Channel!",
+              ephemeral: true,
+            });
+          }
         } else {
           interaction.reply({
-            content: "Fehler: Das geht nur im Log Channel!",
+            content: "Fehler: Das ist keine gültige Startnachricht!",
             ephemeral: true,
           });
         }
       } else {
         interaction.reply({
-          content: "Fehler: Das ist keine gültige Startnachricht!",
+          content: "Fehler: Du hast nicht genug Rechte!",
           ephemeral: true,
         });
       }
