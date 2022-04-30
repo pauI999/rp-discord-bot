@@ -89,7 +89,6 @@ module.exports = {
             content: replystring,
             ephemeral: false,
           });
-          console.log(map);
         } else {
           interaction.reply({
             content: "Fehler: Das geht nur im Log Channel!",
