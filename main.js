@@ -13,6 +13,7 @@ const client = new Discord.Client({
     Discord.Intents.FLAGS.GUILD_MEMBERS,
     Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
   ],
+  partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
 
 // Clean Abgabenliste Funktion
