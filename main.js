@@ -491,7 +491,7 @@ client.on("guildMemberRemove", async (member) => {
   if (config.leavechannel !== "0") {
     const embed = new Discord.MessageEmbed()
       .setColor(config.colorhex)
-      .setTitle(`Tschüss ${member.nickname}, fick dein Vater!`)
+      .setTitle(`Tschüss ${member.displayName}, fick dein Vater!`)
       .setImage(
         "https://www.pcgames.de/screenshots/1000x562/2021/10/GTA-6.2-buffed1.jpg"
       )
