@@ -489,12 +489,16 @@ client.once("ready", async () => {
 
 client.on("guildMemberRemove", async (member) => {
   if (config.leavechannel !== "0") {
+    const embed = new Discord.MessageEmbed()
+      .setColor(config.colorhex)
+      .setTitle(`Tschüss <@${member.id}>, fick dein Vater!`)
+      .setImage(
+        "https://images.emojiterra.com/google/android-pie/512px/1f981.png"
+      )
+      .setTimestamp()
+      .setFooter({ text: member.guild.name });
     let channel = member.guild.channels.cache.get(config.leavechannel);
-    channel.send(`Tschüss <@${member.id}>, fick dein Vater!`, {
-      files: [
-        "https://images.emojiterra.com/google/android-pie/512px/1f981.png",
-      ],
-    });
+    channel.send({ embeds: [embed] });
   }
 });
 
