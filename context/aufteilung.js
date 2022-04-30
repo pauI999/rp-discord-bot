@@ -54,8 +54,7 @@ module.exports = {
                     embed.description.includes("Waffenbestellung") &&
                     embed.description.includes("entgegengenommen")
                   ) {
-                    let id = embed.author.name.split(" ");
-                    id = embed.author.name.split(" ")[id.lenght - 1];
+                    let id = embed.author.name.split(" ")[2];
                     if (map.has(id)) {
                       let newpreis =
                         parseInt(map.get(id)) +
