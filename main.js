@@ -558,6 +558,8 @@ client.on("messageCreate", async (message) => {
       message.channel.send(
         "Bitte an <#969787601294864384> halten! <:marceloThumbsUp:969784438596718632>"
       );
+    } else if (command === "schwein") {
+      message.channel.send("Du Straßenschwein! :pig:");
     }
   }
   if (!message.content.startsWith(config.prefix)) return;
