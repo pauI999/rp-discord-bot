@@ -487,6 +487,13 @@ client.once("ready", async () => {
   })();
 });
 
+client.on("guildMemberRemove", async (member) => {
+  if (config.leavechannel !== "0") {
+    let channel = member.guild.channels.cache.get(config.leavechannel);
+    channel.send(`Tschüss <@${member.id}>, fick dein Vater!`);
+  }
+});
+
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isCommand()) {
     const command = client.commands.get(interaction.commandName);
