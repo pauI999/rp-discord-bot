@@ -490,9 +490,10 @@ client.once("ready", async () => {
 client.on("guildMemberRemove", async (member) => {
   if (config.leavechannel !== "0") {
     let channel = member.guild.channels.cache.get(config.leavechannel);
-    channel.send({
-      message: `Tschüss <@${member.id}>, fick dein Vater!`,
-      file: "https://images.emojiterra.com/google/android-pie/512px/1f981.png",
+    channel.send(`Tschüss <@${member.id}>, fick dein Vater!`, {
+      files: [
+        "https://images.emojiterra.com/google/android-pie/512px/1f981.png",
+      ],
     });
   }
 });
