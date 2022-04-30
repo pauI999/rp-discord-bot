@@ -41,15 +41,15 @@
     "rohrzange": "320000",
     "hammer": "320000",
     "schlagring": "320000",
-    "golfschläger": "320000",
+    "golfschlaeger": "320000",
     "klappmesser": "320000",
     "kampfaxt": "320000",
     "machete": "320000",
     "messer": "320000",
     "axt": "320000",
     "dolch": "320000",
-    "kö": "320000",
+    "koe": "320000",
     "brechstange": "320000"
   },
-  "waffenstring": "'adw', 'spezi', 'gusenberg', 'ak', 'kampfsmg', 'kompakt', 'pdw', 'smg', '50er', 'schwere', 'sns', 'flasche', 'rohrzange', 'hammer', 'schlagring', 'golfschläger', 'klappmesser', 'kampfaxt', 'machete', 'messer', 'axt', 'dolch', 'kö', 'brechstange'"
+ "waffenstring": "'adw', 'spezi', 'gusenberg', 'ak', 'kampfsmg', 'kompakt', 'pdw', 'smg', '50er', 'schwere', 'sns', 'flasche', 'rohrzange', 'hammer', 'schlagring', 'golfschlaeger', 'klappmesser', 'kampfaxt', 'machete', 'messer', 'axt', 'dolch', 'koe', 'brechstange'"
 }
