@@ -555,7 +555,9 @@ client.on("messageCreate", async (message) => {
     if (command === "ic") {
       message.channel.send("Find‘s ic heraus! :slight_smile:");
     } else if (command === "waffe") {
-      message.channel.send("Bitte an <#969787601294864384> halten <:MarceloHappy:799542513579851797>");
+      message.channel.send(
+        "Bitte an <#969787601294864384> halten <:marceloThumbsUp:969784438596718632>"
+      );
     }
   }
   if (!message.content.startsWith(config.prefix)) return;
