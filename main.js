@@ -577,35 +577,39 @@ client.on("messageCreate", async (message) => {
             for (let i = 0; i < args.length; i = i + 2) {
               if (waffen.has(args[i].toLocaleLowerCase())) {
                 if (functions.isNumeric(args[i + 1])) {
-                  if (
-                    args[i].toLocaleLowerCase() == "adw" ||
-                    args[i].toLocaleLowerCase() == "gusenberg" ||
-                    args[i].toLocaleLowerCase() == "spezi" ||
-                    args[i].toLocaleLowerCase() == "ak" ||
-                    args[i].toLocaleLowerCase() == "kompakt"
-                  ) {
+                  if (config.waffenleaderschaft) {
                     if (
-                      functions.isLeaderschaft(message.member) ||
-                      functions.isFamilienrat(message.member)
+                      args[i].toLocaleLowerCase() == "adw" ||
+                      args[i].toLocaleLowerCase() == "gusenberg" ||
+                      args[i].toLocaleLowerCase() == "spezi" ||
+                      args[i].toLocaleLowerCase() == "ak" ||
+                      args[i].toLocaleLowerCase() == "kompakt"
                     ) {
-                      weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
+                      if (
+                        functions.isLeaderschaft(message.member) ||
+                        functions.isFamilienrat(message.member)
+                      ) {
+                        weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
+                      } else {
+                        error = true;
+                        message
+                          .reply(
+                            "Fehler: Momentan kann nur die Leaderschaft oder der Familienrat Langwaffen bestellen!"
+                          )
+                          .then((msg) => {
+                            setTimeout(
+                              () => msg.delete().catch((error) => {}),
+                              config.timeout
+                            );
+                            setTimeout(
+                              () => message.delete().catch((error) => {}),
+                              config.timeout
+                            );
+                          });
+                        break;
+                      }
                     } else {
-                      error = true;
-                      message
-                        .reply(
-                          "Fehler: Momentan kann nur die Leaderschaft oder der Familienrat Langwaffen bestellen!"
-                        )
-                        .then((msg) => {
-                          setTimeout(
-                            () => msg.delete().catch((error) => {}),
-                            config.timeout
-                          );
-                          setTimeout(
-                            () => message.delete().catch((error) => {}),
-                            config.timeout
-                          );
-                        });
-                      break;
+                      weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
                     }
                   } else {
                     weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
