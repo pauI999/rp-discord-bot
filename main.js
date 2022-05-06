@@ -578,15 +578,15 @@ client.on("messageCreate", async (message) => {
               if (waffen.has(args[i].toLocaleLowerCase())) {
                 if (functions.isNumeric(args[i + 1])) {
                   if (
-                    args[i].toLocaleLowerCase == "adw" ||
-                    args[i].toLocaleLowerCase == "gusenberg" ||
-                    args[i].toLocaleLowerCase == "spezi" ||
-                    args[i].toLocaleLowerCase == "ak" ||
-                    args[i].toLocaleLowerCase == "kompakt"
+                    args[i].toLocaleLowerCase() == "adw" ||
+                    args[i].toLocaleLowerCase() == "gusenberg" ||
+                    args[i].toLocaleLowerCase() == "spezi" ||
+                    args[i].toLocaleLowerCase() == "ak" ||
+                    args[i].toLocaleLowerCase() == "kompakt"
                   ) {
                     if (
-                      functions.isLeaderschaft(message.author) ||
-                      functions.isFamilienrat(message.author)
+                      functions.isLeaderschaft(message.member) ||
+                      functions.isFamilienrat(message.member)
                     ) {
                       weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
                     } else {
