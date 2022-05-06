@@ -492,9 +492,7 @@ client.on("guildMemberRemove", async (member) => {
     const embed = new Discord.MessageEmbed()
       .setColor(config.colorhex)
       .setTitle(`Tschüss ${member.displayName}, fick dein Vater!`)
-      .setImage(
-        "https://www.pcgames.de/screenshots/1000x562/2021/10/GTA-6.2-buffed1.jpg"
-      )
+      .setImage("https://i.ibb.co/Q6WH8ZM/f-rdiebrigada.png")
       .setTimestamp()
       .setFooter({ text: member.guild.name });
     let channel = member.guild.channels.cache.get(config.leavechannel);
@@ -579,7 +577,39 @@ client.on("messageCreate", async (message) => {
             for (let i = 0; i < args.length; i = i + 2) {
               if (waffen.has(args[i].toLocaleLowerCase())) {
                 if (functions.isNumeric(args[i + 1])) {
-                  weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
+                  if (
+                    args[i].toLocaleLowerCase == "adw" ||
+                    args[i].toLocaleLowerCase == "gusenberg" ||
+                    args[i].toLocaleLowerCase == "spezi" ||
+                    args[i].toLocaleLowerCase == "ak" ||
+                    args[i].toLocaleLowerCase == "kompakt"
+                  ) {
+                    if (
+                      functions.isLeaderschaft(message.author) ||
+                      functions.isFamilienrat(message.author)
+                    ) {
+                      weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
+                    } else {
+                      error = true;
+                      message
+                        .reply(
+                          "Fehler: Momentan kann nur die Leaderschaft oder der Familienrat Langwaffen bestellen!"
+                        )
+                        .then((msg) => {
+                          setTimeout(
+                            () => msg.delete().catch((error) => {}),
+                            config.timeout
+                          );
+                          setTimeout(
+                            () => message.delete().catch((error) => {}),
+                            config.timeout
+                          );
+                        });
+                      break;
+                    }
+                  } else {
+                    weapons.set(args[i].toLocaleLowerCase(), args[i + 1]);
+                  }
                 } else {
                   error = true;
                   message
