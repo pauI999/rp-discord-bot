@@ -2110,6 +2110,11 @@ client.on("messageCreate", async (message) => {
           'wsum" um die Waffenbestellung zusammenzufassen';
       }
       msg =
+        msg +
+        '\n - "' +
+        config.prefix +
+        'aussetzen" um einen random Familienmitlgied zu bekommen';
+      msg =
         msg + '\n - "' + config.prefix + 'help" um diese Nachricht zu bekommen';
       message.reply(msg).then((msg) => {
         msg.react("🗑️");
