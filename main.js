@@ -1752,6 +1752,54 @@ client.on("messageCreate", async (message) => {
       }
     }
   }
+  // Aussetzen
+  if (command === "aussetzen") {
+    if (
+      functions.isLeaderschaft(message.member) ||
+      functions.isFamilienrat(message.member)
+    ) {
+      const pool = [];
+      message.guild.members.cache.each((member) => {
+        if (member.roles.cache.some((role) => role.id === config.familie)) {
+          if (
+            !member.roles.cache.some((role) => role.id === config.leaderschaft)
+          ) {
+            if (
+              !member.roles.cache.some((role) => role.id === config.familienrat)
+            ) {
+              pool.push(member);
+            }
+          }
+        }
+      });
+      var picked = pool[Math.floor(Math.random() * pool.length)];
+      message
+        .reply(`Aussetzen: ${picked} :headstone:`)
+        .then((msg) => {
+          setTimeout(
+            () => message.delete().catch((error) => {}),
+            config.timeout
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else {
+      message
+        .reply(`Fehler: Du hast nicht genug Rechte!`)
+        .then((msg) => {
+          setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+          setTimeout(
+            () => message.delete().catch((error) => {}),
+            config.timeout
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }
+
   // Routen-Verkauf
   if (config.routechannel !== "0") {
     // Verkauf Hinzufügen Command
