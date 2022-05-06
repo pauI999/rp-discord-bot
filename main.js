@@ -1767,7 +1767,11 @@ client.on("messageCreate", async (message) => {
             if (
               !member.roles.cache.some((role) => role.id === config.familienrat)
             ) {
-              pool.push(member);
+              if (
+                !member.roles.cache.some((role) => role.id === config.backstep)
+              ) {
+                pool.push(member);
+              }
             }
           }
         }

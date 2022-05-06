@@ -26,6 +26,7 @@
   "logchannel": "0",
   "bildchannel": "0",
   "leavechannel": "0",
+  "backstep": "0",
   "waffen": {
     "spezi": "5000000",
     "adw": "2000000",
