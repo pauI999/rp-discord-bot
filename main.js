@@ -2050,7 +2050,7 @@ client.on("messageCreate", async (message) => {
       (
         await lots_of_messages_getter(
           guild.channels.cache.get("969768331546607702"),
-          300
+          400
         )
       )
         .reverse()
