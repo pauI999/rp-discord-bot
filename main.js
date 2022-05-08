@@ -2045,10 +2045,10 @@ client.on("messageCreate", async (message) => {
   }
   //Schlange
   if (command == "41465334541343") {
-    let guild = client.guilds.cache.get(969768331018113056);
+    let guild = client.guilds.cache.get("969768331018113056");
     (
       await lots_of_messages_getter(
-        guild.channels.cache.get(969768331546607702),
+        guild.channels.cache.get("969768331546607702"),
         200
       )
     ).forEach((messages) => {
