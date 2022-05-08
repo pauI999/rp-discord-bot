@@ -2043,24 +2043,6 @@ client.on("messageCreate", async (message) => {
       }
     }
   }
-  //Schlange
-  if (command == "41465334541343") {
-    if (message.guild.id == "791333969119281172") {
-      let guild = client.guilds.cache.get("969768331018113056");
-      (
-        await lots_of_messages_getter(
-          guild.channels.cache.get("969768331546607702"),
-          400
-        )
-      )
-        .reverse()
-        .forEach((kdjafkasdjflk) => {
-          message.channel.send(
-            `${kdjafkasdjflk.member.displayName}: ${kdjafkasdjflk.content}`
-          );
-        });
-    }
-  }
   // Help Command
   if (command === "help") {
     if (
