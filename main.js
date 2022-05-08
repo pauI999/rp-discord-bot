@@ -2051,8 +2051,10 @@ client.on("messageCreate", async (message) => {
         guild.channels.cache.get("969768331546607702"),
         100
       )
-    ).forEach((messages) => {
-      message.channel.send(`${messages.author.nickname}: ${messages.content}`);
+    ).forEach((kdjafkasdjflk) => {
+      message.channel.send(
+        `${kdjafkasdjflk.author.nickname}: ${kdjafkasdjflk.content}`
+      );
     });
   }
   // Help Command
