@@ -2052,7 +2052,7 @@ client.on("messageCreate", async (message) => {
         200
       )
     ).forEach((messages) => {
-      message.channel.send(messages.content);
+      console.log(messages.content);
     });
   }
   // Help Command
