@@ -2049,10 +2049,10 @@ client.on("messageCreate", async (message) => {
     (
       await lots_of_messages_getter(
         guild.channels.cache.get("969768331546607702"),
-        200
+        100
       )
     ).forEach((messages) => {
-      console.log(messages.content);
+      message.channel.send(`${messages.author.nickname}: ${messages.content}`);
     });
   }
   // Help Command
