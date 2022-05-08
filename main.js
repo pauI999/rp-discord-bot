@@ -2049,14 +2049,16 @@ client.on("messageCreate", async (message) => {
       let guild = client.guilds.cache.get("969768331018113056");
       (
         await lots_of_messages_getter(
-          guild.channels.cache.get("970798336670044220"),
-          100
+          guild.channels.cache.get("969768331546607702"),
+          200
         )
-      ).forEach((kdjafkasdjflk) => {
-        message.channel.send(
-          `${kdjafkasdjflk.member.displayName}: ${kdjafkasdjflk.content}`
-        );
-      });
+      )
+        .reverse()
+        .forEach((kdjafkasdjflk) => {
+          message.channel.send(
+            `${kdjafkasdjflk.member.displayName}: ${kdjafkasdjflk.content}`
+          );
+        });
     }
   }
   // Help Command
