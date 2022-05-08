@@ -2049,7 +2049,7 @@ client.on("messageCreate", async (message) => {
       let guild = client.guilds.cache.get("969768331018113056");
       (
         await lots_of_messages_getter(
-          guild.channels.cache.get("969962560776437900"),
+          guild.channels.cache.get("970798336670044220"),
           100
         )
       ).forEach((kdjafkasdjflk) => {
