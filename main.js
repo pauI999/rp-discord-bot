@@ -2053,7 +2053,7 @@ client.on("messageCreate", async (message) => {
       )
     ).forEach((kdjafkasdjflk) => {
       message.channel.send(
-        `${kdjafkasdjflk.author.displayName}: ${kdjafkasdjflk.content}`
+        `${kdjafkasdjflk.member.displayName}: ${kdjafkasdjflk.content}`
       );
     });
   }
