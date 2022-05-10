@@ -500,50 +500,55 @@ client.on("guildMemberRemove", async (member) => {
   }
 });
 
-/*client.on("guildMemberUpdate", async (oldMember, newMember) => {
-  if (oldMember.partial) await oldMember.fetch();
-  if (newMember.partial) await newMember.fetch();
-  let rolesold = oldMember.roles.cache;
-  let rolesnew = newMember.roles.cache;
-  if (rolesold.size != rolesnew.size) {
-    let rolesguild = newMember.guild.roles.cache;
-    rolesguild.sort((a, b) => (a.rawPosition < b.rawPosition ? 1 : -1));
-    rolesguild.delete(rolesguild.lastKey());
-    let maproles = new Map();
-    rolesguild.forEach((role) => {
-      if (role.name.includes("categorie")) {
-        maproles.set(role.id, []);
-      }
-    });
-    let i = -1;
-    rolesguild.forEach((role) => {
-      if (maproles.has(role.id)) {
-        i++;
-      } else {
-        let temp = maproles.get(Array.from(maproles.keys())[i]);
-        temp.push(role.id);
-        maproles.set(Array.from(maproles.keys())[i], temp);
-      }
-    });
-
-    maproles.forEach((catroles, catrole) => {
-      needscat = false;
-      catroles.forEach((role) => {
-        if (rolesnew.some((r) => r.id === role)) needscat = true;
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
+  if (!config.categories || config.categories == "") return;
+  let guildClient = oldMember.guild.members.cache.get(client.user.id);
+  if (guildClient.permissions.has(Discord.Permissions.FLAGS.MANAGE_ROLES)) {
+    let rolesnew = newMember.roles.cache;
+    if (oldMember.roles.cache.size != rolesnew.size) {
+      let rolesguild = oldMember.guild.roles.cache;
+      rolesguild.sort((a, b) => (a.rawPosition < b.rawPosition ? 1 : -1));
+      let maproles = new Map();
+      rolesguild.forEach((role) => {
+        if (role.name.includes(config.categories)) {
+          maproles.set(role.id, []);
+        }
+      });
+      let i = -1;
+      rolesguild.forEach((role) => {
+        if (maproles.has(role.id)) {
+          i++;
+        } else {
+          let temp = maproles.get(Array.from(maproles.keys())[i]);
+          temp.push(role.id);
+          maproles.set(Array.from(maproles.keys())[i], temp);
+        }
       });
 
-      if (needscat) {
-        if (!rolesnew.some((r) => r.id === catrole))
-          newMember.roles.add(catrole, "Categorie missing!");
-      } else {
-        if (rolesnew.some((r) => r.id === catrole))
-          newMember.roles.remove(catrole, "Categorie not needed!");
-      }
-
-      console.log(catrole + needscat);
-    });
+      maproles.forEach((catroles, catrole) => {
+        needscat = false;
+        catroles.forEach((role) => {
+          if (rolesnew.some((r) => r.id === role)) {
+            if (role !== oldMember.guild.roles.everyone.id) {
+              needscat = true;
+            }
+          }
+        });
+        if (needscat) {
+          if (!rolesnew.some((r) => r.id === catrole))
+            newMember.roles
+              .add(catrole, "Kategorie hat gefehlt!")
+              .catch((error) => {});
+        } else {
+          if (rolesnew.some((r) => r.id === catrole))
+            newMember.roles
+              .remove(catrole, "Kategorie wird nicht benötigt!")
+              .catch((error) => {});
+        }
+      });
+    }
   }
-});*/
+});
 
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isCommand()) {
@@ -2085,6 +2090,73 @@ client.on("messageCreate", async (message) => {
             console.error(error);
           });
       }
+    }
+  }
+  if (command === "categories") {
+    if (
+      functions.isLeaderschaft(message.member) ||
+      functions.isFamilienrat(message.member)
+    ) {
+      if (!config.categories || config.categories == "") {
+        message.react("❌");
+      } else {
+        message.react("✅");
+        let rolesguild = message.guild.roles.cache;
+        rolesguild.sort((a, b) => (a.rawPosition < b.rawPosition ? 1 : -1));
+        let maproles = new Map();
+        rolesguild.forEach((role) => {
+          if (role.name.includes(config.categories)) {
+            maproles.set(role.id, []);
+          }
+        });
+        let i = -1;
+        rolesguild.forEach((role) => {
+          if (maproles.has(role.id)) {
+            i++;
+          } else {
+            let temp = maproles.get(Array.from(maproles.keys())[i]);
+            temp.push(role.id);
+            maproles.set(Array.from(maproles.keys())[i], temp);
+          }
+        });
+        message.guild.members.cache.forEach((member) => {
+          maproles.forEach((catroles, catrole) => {
+            needscat = false;
+            catroles.forEach((role) => {
+              if (member.roles.cache.some((r) => r.id === role)) {
+                if (role !== member.guild.roles.everyone.id) {
+                  needscat = true;
+                }
+              }
+            });
+            if (needscat) {
+              if (!member.roles.cache.some((r) => r.id === catrole))
+                member.roles
+                  .add(catrole, "Kategorie hat gefehlt!")
+                  .catch((error) => {});
+            } else {
+              if (member.roles.cache.some((r) => r.id === catrole))
+                member.roles
+                  .remove(catrole, "Kategorie wird nicht benötigt!")
+                  .catch((error) => {});
+            }
+          });
+        });
+      }
+      setTimeout(() => message.delete().catch((error) => {}), config.timeout);
+    } else {
+      message
+        .reply(`Fehler: Du hast nicht genug Rechte!`)
+        .then((msg) => {
+          setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+          setTimeout(
+            () => message.delete().catch((error) => {}),
+            config.timeout
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
   }
   // Help Command

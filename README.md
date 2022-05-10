@@ -53,6 +53,7 @@
     "koe": "320000",
     "brechstange": "320000"
   },
+  "categories": "»",
   "waffenleaderschaft": true,
   "waffenstring": "'adw', 'spezi', 'gusenberg', 'ak', 'kampfsmg', 'kompakt', 'pdw', 'smg', '50er', 'schwere', 'sns', 'flasche', 'rohrzange', 'hammer', 'schlagring', 'golfschlaeger', 'klappmesser', 'kampfaxt', 'machete', 'messer', 'axt', 'dolch', 'koe', 'brechstange'"
 }
