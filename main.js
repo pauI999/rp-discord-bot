@@ -500,6 +500,51 @@ client.on("guildMemberRemove", async (member) => {
   }
 });
 
+/*client.on("guildMemberUpdate", async (oldMember, newMember) => {
+  if (oldMember.partial) await oldMember.fetch();
+  if (newMember.partial) await newMember.fetch();
+  let rolesold = oldMember.roles.cache;
+  let rolesnew = newMember.roles.cache;
+  if (rolesold.size != rolesnew.size) {
+    let rolesguild = newMember.guild.roles.cache;
+    rolesguild.sort((a, b) => (a.rawPosition < b.rawPosition ? 1 : -1));
+    rolesguild.delete(rolesguild.lastKey());
+    let maproles = new Map();
+    rolesguild.forEach((role) => {
+      if (role.name.includes("categorie")) {
+        maproles.set(role.id, []);
+      }
+    });
+    let i = -1;
+    rolesguild.forEach((role) => {
+      if (maproles.has(role.id)) {
+        i++;
+      } else {
+        let temp = maproles.get(Array.from(maproles.keys())[i]);
+        temp.push(role.id);
+        maproles.set(Array.from(maproles.keys())[i], temp);
+      }
+    });
+
+    maproles.forEach((catroles, catrole) => {
+      needscat = false;
+      catroles.forEach((role) => {
+        if (rolesnew.some((r) => r.id === role)) needscat = true;
+      });
+
+      if (needscat) {
+        if (!rolesnew.some((r) => r.id === catrole))
+          newMember.roles.add(catrole, "Categorie missing!");
+      } else {
+        if (rolesnew.some((r) => r.id === catrole))
+          newMember.roles.remove(catrole, "Categorie not needed!");
+      }
+
+      console.log(catrole + needscat);
+    });
+  }
+});*/
+
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isCommand()) {
     const command = client.commands.get(interaction.commandName);
@@ -1973,14 +2018,13 @@ client.on("messageCreate", async (message) => {
                 .send(
                   `Insgesamt: ${functions.addDots(amount)} ${
                     config.droge
-                  } → Grün: **${functions.addDots(
-                    amount * config.preisg
-                  )}$**, davon Geld an Leaderschaft: **${functions.addDots(
+                  } → Grün: **${functions.addDots(amount * config.preisg)}$**`
+                  /*, davon Geld an Leaderschaft: **${functions.addDots(
                     amount * config.preisg - amount * config.preisavv
                   )}$** ➜ Anteil pro Leaderschafter: **${functions.addDots(
                     (amount * config.preisg - amount * config.preisavv) /
                       config.leaderschafter
-                  )}$**`
+                  )}$**`*/
                 )
                 .then(() => {
                   setTimeout(
