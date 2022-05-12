@@ -55,6 +55,7 @@ function toggleAbgaben(interaction, user, kw) {
               "Fehler: Das Mitglied muss diese Woche noch keine Abgaben zahlen!",
             ephemeral: true,
           });
+          return;
         }
       }
     });
