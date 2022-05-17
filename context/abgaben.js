@@ -9,7 +9,7 @@ function toggleAbgaben(interaction, user, kw) {
     kassechannel = interaction.guild.channels.cache.get(config.kassechannel);
   }
   let done = false;
-  channel.messages.fetch({ limit: 6 }).then((messages) => {
+  channel.messages.fetch().then((messages) => {
     messages.each((smessage) => {
       if (smessage.content.includes(`**${kw}**`)) {
         if (smessage.content.includes(user)) {
