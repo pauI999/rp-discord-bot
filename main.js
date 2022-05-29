@@ -502,6 +502,10 @@ client.on("guildMemberRemove", async (member) => {
 
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
   if (!config.categories || config.categories == "") return;
+  let categories = config.categories;
+  if (config.categories == "brigadapfeil") {
+    categories = "»";
+  }
   let guildClient = oldMember.guild.members.cache.get(client.user.id);
   if (guildClient.permissions.has(Discord.Permissions.FLAGS.MANAGE_ROLES)) {
     let rolesnew = newMember.roles.cache;
@@ -510,7 +514,7 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
       rolesguild.sort((a, b) => (a.rawPosition < b.rawPosition ? 1 : -1));
       let maproles = new Map();
       rolesguild.forEach((role) => {
-        if (role.name.includes(config.categories)) {
+        if (role.name.includes(categories)) {
           maproles.set(role.id, []);
         }
       });
@@ -2100,12 +2104,16 @@ client.on("messageCreate", async (message) => {
       if (!config.categories || config.categories == "") {
         message.react("❌");
       } else {
+        let categories = config.categories;
+        if (config.categories == "brigadapfeil") {
+          categories = "»";
+        }
         message.react("✅");
         let rolesguild = message.guild.roles.cache;
         rolesguild.sort((a, b) => (a.rawPosition < b.rawPosition ? 1 : -1));
         let maproles = new Map();
         rolesguild.forEach((role) => {
-          if (role.name.includes(config.categories)) {
+          if (role.name.includes(categories)) {
             maproles.set(role.id, []);
           }
         });
@@ -2224,6 +2232,13 @@ client.on("messageCreate", async (message) => {
           '\n - "' +
           config.prefix +
           'wsum" um die Waffenbestellung zusammenzufassen';
+      }
+      if (config.categories !== "") {
+        msg =
+          msg +
+          '\n - "' +
+          config.prefix +
+          'categories" um die Rollen-Kategorien aller Member zu aktualisiern';
       }
       msg =
         msg +
