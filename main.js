@@ -612,6 +612,10 @@ client.on("messageCreate", async (message) => {
       );
     } else if (command === "schwein") {
       message.channel.send("Du Schwein! :pig:");
+    } else if (command === "chat") {
+      message.channel.send(
+        "Chattet woanders ihr ... <:marceloThumbsDown:969785051325812796>"
+      );
     }
   }
   if (!message.content.startsWith(config.prefix)) return;
