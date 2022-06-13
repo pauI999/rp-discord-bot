@@ -29,7 +29,7 @@
   "backstep": "0",
   "waffen": {
     "spezi": "3750000",
-    "adv": "1500000",
+    "adw": "1500000",
     "gusenberg": "1200000",
     "ak": "1300000",
     "kampfsmg": "1000000",
@@ -55,5 +55,5 @@
   },
   "categories": "»",
   "waffenleaderschaft": true,
-  "waffenstring": "'adv', 'spezi', 'gusenberg', 'ak', 'kampfsmg', 'kompakt', 'pdw', 'smg', '50er', 'schwere', 'sns', 'flasche', 'rohrzange', 'hammer', 'schlagring', 'golfschlaeger', 'klappmesser', 'kampfaxt', 'machete', 'messer', 'axt', 'dolch', 'koe', 'brechstange'"
+  "waffenstring": "'adw', 'spezi', 'gusenberg', 'ak', 'kampfsmg', 'kompakt', 'pdw', 'smg', '50er', 'schwere', 'sns', 'flasche', 'rohrzange', 'hammer', 'schlagring', 'golfschlaeger', 'klappmesser', 'kampfaxt', 'machete', 'messer', 'axt', 'dolch', 'koe', 'brechstange'"
 }
