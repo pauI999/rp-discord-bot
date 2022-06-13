@@ -169,7 +169,8 @@ async function deletelast(message) {
                     () => msg.delete().catch((error) => {}),
                     config.timeout
                   );
-                });
+                })
+                .catch({});
             } else {
               message
                 .reply(
@@ -184,7 +185,8 @@ async function deletelast(message) {
                     () => msg.delete().catch((error) => {}),
                     config.timeout
                   );
-                });
+                })
+                .catch({});
             }
           }
         }
@@ -202,7 +204,8 @@ async function deletelast(message) {
               config.timeout
             );
             setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
-          });
+          })
+          .catch({});
       }
     });
 }
