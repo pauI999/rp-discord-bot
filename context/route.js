@@ -14,6 +14,7 @@ module.exports = {
           content: `Du hast jetzt 10 Sekunden Zeit, um in <#${config.routechannel}> die Anzahl reinzusenden! Wenn du nichts schreibst, passiert auch nichts. Wenn keine Zahl geschrieben wird, passiert auch nichts!`,
           ephemeral: true,
         });
+
         let routechannel = interaction.channel.guild.channels.cache.get(
           config.routechannel
         );

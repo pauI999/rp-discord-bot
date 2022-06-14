@@ -212,7 +212,7 @@ async function deletelast(message) {
 
 // Aktivität Help Funktion
 
-async function lots_of_messages_getter(channel, limit = 500, time = 30) {
+async function lots_of_messages_getter(channel, limit = 500) {
   const sum_messages = [];
   let last_id;
 
