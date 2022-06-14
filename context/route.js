@@ -11,7 +11,7 @@ module.exports = {
         functions.isFamilienrat(interaction.member)
       ) {
         interaction.reply({
-          content: `Du hast jetzt 10 Sekunden Zeit, um in <#${config.routechannel}> die Anzahl reinzusenden! Wenn du nichts schreibst, passiert auch nichts`,
+          content: `Du hast jetzt 10 Sekunden Zeit, um in <#${config.routechannel}> die Anzahl reinzusenden! Wenn du nichts schreibst, passiert auch nichts. Wenn keine Zahl geschrieben wird, passiert auch nichts!`,
           ephemeral: true,
         });
         let routechannel = interaction.channel.guild.channels.cache.get(
