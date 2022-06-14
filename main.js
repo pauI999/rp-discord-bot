@@ -1880,20 +1880,35 @@ client.on("messageCreate", async (message) => {
                 const user = await client.users
                   .fetch(args[0])
                   .catch(console.error);
-                message.channel
-                  .send(
-                    `${user} hat ${functions.addDots(args[1])} ${
-                      config.droge
-                    } abgegeben → ${functions.addDots(
-                      args[1] * config.preisavv
-                    )}$`
-                  )
-                  .then(() => {
-                    setTimeout(
-                      () => message.delete().catch((error) => {}),
-                      config.timeout
-                    );
-                  });
+                if (config.preisg !== "0") {
+                  message.channel
+                    .send(
+                      `${user} hat ${functions.addDots(args[1])} ${
+                        config.droge
+                      } abgegeben → ${functions.addDots(
+                        args[1] * config.preisavv
+                      )}$`
+                    )
+                    .then(() => {
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                    });
+                } else {
+                  message.channel
+                    .send(
+                      `${user} hat ${functions.addDots(args[1])} ${
+                        config.droge
+                      } abgegeben`
+                    )
+                    .then(() => {
+                      setTimeout(
+                        () => message.delete().catch((error) => {}),
+                        config.timeout
+                      );
+                    });
+                }
               } else {
                 const user = message.mentions.users.first();
                 if (user === undefined) {
@@ -1912,20 +1927,35 @@ client.on("messageCreate", async (message) => {
                       );
                     });
                 } else {
-                  message.channel
-                    .send(
-                      `${user} hat ${functions.addDots(args[1])} ${
-                        config.droge
-                      } abgegeben → ${functions.addDots(
-                        args[1] * config.preisavv
-                      )}$`
-                    )
-                    .then(() => {
-                      setTimeout(
-                        () => message.delete().catch((error) => {}),
-                        config.timeout
-                      );
-                    });
+                  if (config.preisg !== "0") {
+                    message.channel
+                      .send(
+                        `${user} hat ${functions.addDots(args[1])} ${
+                          config.droge
+                        } abgegeben → ${functions.addDots(
+                          args[1] * config.preisavv
+                        )}$`
+                      )
+                      .then(() => {
+                        setTimeout(
+                          () => message.delete().catch((error) => {}),
+                          config.timeout
+                        );
+                      });
+                  } else {
+                    message.channel
+                      .send(
+                        `${user} hat ${functions.addDots(args[1])} ${
+                          config.droge
+                        } abgegeben`
+                      )
+                      .then(() => {
+                        setTimeout(
+                          () => message.delete().catch((error) => {}),
+                          config.timeout
+                        );
+                      });
+                  }
                 }
               }
             } else {
