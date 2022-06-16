@@ -93,6 +93,34 @@ function logEmbed(member, title, description) {
   channel.send({ embeds: [embed] });
 }
 
+// Aktivität Help Funktion
+async function lots_of_messages_getter(channel, limit = 500) {
+  const sum_messages = [];
+  let last_id;
+
+  while (true) {
+    const options = { limit: 100 };
+    if (last_id) {
+      options.before = last_id;
+    }
+
+    const messages = await channel.messages.fetch(options);
+    sum_messages.push(...messages);
+    last_id = messages.last().id;
+
+    if (messages.size != 100 || sum_messages.length >= limit) {
+      break;
+    }
+  }
+  const final_messages = [];
+
+  sum_messages.forEach((summessage) => {
+    final_messages.push(summessage[1]);
+  });
+
+  return final_messages;
+}
+
 module.exports = {
   isNumeric,
   sendAbgabenMessage,
@@ -102,4 +130,5 @@ module.exports = {
   isFamilienrat,
   addDots,
   logEmbed,
+  lots_of_messages_getter,
 };

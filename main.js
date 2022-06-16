@@ -210,35 +210,6 @@ async function deletelast(message) {
     });
 }
 
-// Aktivität Help Funktion
-
-async function lots_of_messages_getter(channel, limit = 500) {
-  const sum_messages = [];
-  let last_id;
-
-  while (true) {
-    const options = { limit: 100 };
-    if (last_id) {
-      options.before = last_id;
-    }
-
-    const messages = await channel.messages.fetch(options);
-    sum_messages.push(...messages);
-    last_id = messages.last().id;
-
-    if (messages.size != 100 || sum_messages.length >= limit) {
-      break;
-    }
-  }
-  const final_messages = [];
-
-  sum_messages.forEach((summessage) => {
-    final_messages.push(summessage[1]);
-  });
-
-  return final_messages;
-}
-
 // Aktivität Check Funktion
 async function getActivity(message, user, days) {
   let channel = message.member.guild.channels.cache.get(
@@ -250,7 +221,7 @@ async function getActivity(message, user, days) {
   let timeminutes = 0;
   days = typeof days === "undefined" ? config.activitycheckdaysdefault : days;
 
-  (await lots_of_messages_getter(channel, 700, 30)).forEach(
+  (await functions.lots_of_messages_getter(channel, 700)).forEach(
     async (smessage) => {
       if (cut === false) {
         if (smessage.partial) await smessage.fetch();
