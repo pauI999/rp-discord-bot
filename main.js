@@ -432,6 +432,7 @@ client.once("ready", async () => {
   console.log("----");
 
   client.user.setActivity(config.prefix + "help");
+  client.user.setStatus("dnd");
 
   const CLIENT_ID = client.user.id;
 
