@@ -33,10 +33,10 @@ module.exports = {
           content: `✅ <#${config.routechannel}>`,
           ephemeral: true,
         });
+        let routechannel = interaction.guild.channels.cache.get(
+          config.routechannel
+        );
         if (config.preisg !== "0") {
-          let routechannel = interaction.guild.channels.cache.get(
-            config.routechannel
-          );
           routechannel.send(
             `${interaction.options.getUser(
               "familienmitglied"
