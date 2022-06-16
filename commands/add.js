@@ -34,7 +34,7 @@ module.exports = {
           ephemeral: true,
         });
         if (config.preisg !== "0") {
-          let routechannel = interaction.channel.guild.channels.cache.get(
+          let routechannel = interaction.guild.channels.cache.get(
             config.routechannel
           );
           routechannel.send(
