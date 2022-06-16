@@ -434,6 +434,16 @@ client.once("ready", async () => {
   client.user.setActivity(config.prefix + "help");
   client.user.setStatus("dnd");
 
+  client.application.commands
+    .fetch()
+    .then((command) => {
+      console.log(`Fetched command ${command.name}`);
+      // further delete it like so:
+      //command.delete();
+      //console.log(`Deleted command ${command.name}`);
+    })
+    .catch(console.error);
+
   const CLIENT_ID = client.user.id;
 
   const rest = new REST({
