@@ -460,13 +460,6 @@ client.once("ready", async () => {
       if (err) console.error(err);
     }
   })();
-
-  const guild = client.guilds.cache.get(config.guildID);
-
-  // This takes ~1 hour to update
-  client.application.commands.set([]);
-  // This updates immediately
-  guild.commands.set([]);
 });
 
 client.on("guildMemberRemove", async (member) => {
