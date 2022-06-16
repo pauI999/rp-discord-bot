@@ -10,7 +10,7 @@ module.exports = {
         functions.isFamilienrat(interaction.member)
       ) {
         interaction.reply({
-          content: `Du hast jetzt 10 Sekunden Zeit, um in <#${config.routechannel}> die Anzahl reinzusenden! Wenn du nichts schreibst, passiert auch nichts. Wenn keine Zahl geschrieben wird, passiert auch nichts!`,
+          content: `Du hast jetzt 15 Sekunden Zeit, um in <#${config.routechannel}> die Anzahl reinzusenden! Wenn du nichts schreibst, passiert auch nichts. Wenn keine Zahl geschrieben wird, passiert auch nichts!`,
           ephemeral: true,
         });
 
@@ -24,7 +24,7 @@ module.exports = {
         const collector = routechannel.createMessageCollector({
           filter,
           max: 1,
-          time: 1000 * 10,
+          time: 1000 * 15,
         });
         collector.on("collect", (message) => {
           if (functions.isNumeric(message.content)) {
