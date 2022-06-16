@@ -61,16 +61,23 @@ module.exports = {
             }
           }
         );
-        interaction.reply({
-          content:
-            "<@" +
-            interaction.targetId +
-            "> → " +
-            functions.addDots(amountall) +
-            " " +
-            config.droge,
-          ephemeral: false,
-        });
+        if (config.preisg == "0") {
+          interaction.reply({
+            content: `<@${interaction.targetId}> → ${functions.addDots(
+              amountall
+            )} ${config.droge}`,
+            ephemeral: false,
+          });
+        } else {
+          interaction.reply({
+            content: `<@${interaction.targetId}> → ${functions.addDots(
+              amountall
+            )} ${config.droge} → ${functions.addDots(
+              amountall * config.preisavv
+            )}$`,
+            ephemeral: false,
+          });
+        }
       } else {
         interaction.reply({
           content: "Fehler: Du hast nicht genug Rechte!",
