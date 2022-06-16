@@ -455,22 +455,18 @@ client.once("ready", async () => {
           }
         );
         console.log("Commands wurde lokal registriert!");
-
-        console.log(client.application.commands.cache);
-        /*.forEach((command) => {
-            console.log(
-              `Fetched command ${command.name} - ${command.applicationId}`
-            );
-            // further delete it like so:
-            //command.delete();
-            //console.log(`Deleted command ${command.name}`);
-          })
-          .catch(console.error);*/
       }
     } catch (err) {
       if (err) console.error(err);
     }
   })();
+
+  const guild = client.guilds.cache.get(config.guildID);
+
+  // This takes ~1 hour to update
+  client.application.commands.set([]);
+  // This updates immediately
+  guild.commands.set([]);
 });
 
 client.on("guildMemberRemove", async (member) => {
