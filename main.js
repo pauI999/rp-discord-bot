@@ -575,7 +575,7 @@ client.on("messageCreate", async (message) => {
       }
     }
   }
-  // !a ic Command
+  // !a Commands
   if (message.content.startsWith("!a")) {
     const args = message.content.slice(3).split(/ +/);
     const command = args[0].toLowerCase();
@@ -591,6 +591,16 @@ client.on("messageCreate", async (message) => {
       message.channel.send(
         "Chattet woanders ihr ... <:marceloThumbsDown:969785051325812796>"
       );
+    } else if (command === "perry") {
+      message.channel.send({
+        files: [
+          {
+            name: "perry",
+            attachment:
+              "https://cdn.discordapp.com/attachments/464490824290402320/989108421104115752/perry.mp4",
+          },
+        ],
+      });
     }
   }
   if (!message.content.startsWith(config.prefix)) return;
