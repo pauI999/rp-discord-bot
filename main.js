@@ -594,11 +594,7 @@ client.on("messageCreate", async (message) => {
     } else if (command === "perry") {
       message.channel.send({
         files: [
-          {
-            name: "perry",
-            attachment:
-              "https://cdn.discordapp.com/attachments/464490824290402320/989108421104115752/perry.mp4",
-          },
+          "https://cdn.discordapp.com/attachments/464490824290402320/989108421104115752/perry.mp4",
         ],
       });
     }
