@@ -592,11 +592,9 @@ client.on("messageCreate", async (message) => {
         "Chattet woanders ihr ... <:marceloThumbsDown:969785051325812796>"
       );
     } else if (command === "perry") {
-      message.channel.send({
-        files: [
-          "https://cdn.discordapp.com/attachments/464490824290402320/989108421104115752/perry.mp4",
-        ],
-      });
+      message.channel.send(
+        "https://medal.tv/games/gta-v/clips/oZ8g0JmIq8bqb/d1337vgz7jTB?invite=cr-MSxGU3EsNTI3NDU0MTAs"
+      );
     }
   }
   if (!message.content.startsWith(config.prefix)) return;
