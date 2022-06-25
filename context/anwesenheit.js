@@ -12,7 +12,10 @@ module.exports = {
     ) {
       const namesmsg = [];
 
-      const msgsplit = msg.content.split("\n");
+      const msgsplit = msg.content
+        .replaceAll(":", "")
+        .replaceAll(/[0-9]/g, "")
+        .split("\n");
 
       for (let i = 0; i < msgsplit.length; i++) {
         namesmsg.push(msgsplit[i]);
@@ -22,7 +25,9 @@ module.exports = {
 
       interaction.guild.members.cache.each((member) => {
         if (member.roles.cache.some((role) => role.id === config.familie)) {
-          namesrole.push(member.displayName);
+          namesrole
+            .push(member.displayName.replace(/ *\"[^)]*\" */g, ""))
+            .replaceAll("  ", " ");
         }
       });
 
