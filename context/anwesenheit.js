@@ -25,9 +25,19 @@ module.exports = {
 
       interaction.guild.members.cache.each((member) => {
         if (member.roles.cache.some((role) => role.id === config.familie)) {
-          namesrole
-            .push(member.displayName.replace(/ *\"[^)]*\" */g, ""))
-            .replaceAll("  ", " ");
+          if (
+            !member.roles.cache.some((role) => role.id === "974626295944204288")
+          ) {
+            if (
+              !member.roles.cache.some(
+                (role) => role.id === "979108563119128617"
+              )
+            ) {
+              namesrole
+                .push(member.displayName.replace(/ *\"[^)]*\" */g, ""))
+                .replaceAll("  ", " ");
+            }
+          }
         }
       });
 
