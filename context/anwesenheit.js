@@ -60,7 +60,6 @@ module.exports = {
       if (namesabwesend.length == 0) {
         namesabwesend.push("-");
       }
-      //
 
       const memberCount = interaction.guild.roles.cache.get(config.familie)
         .members.size;
