@@ -18,7 +18,7 @@ module.exports = {
         .split("\n");
 
       for (let i = 0; i < msgsplit.length; i++) {
-        namesmsg.push(msgsplit[i]);
+        namesmsg.push(msgsplit[i].trim());
       }
 
       const namesrole = [];
@@ -33,9 +33,11 @@ module.exports = {
                 (role) => role.id === "979108563119128617"
               )
             ) {
-              namesrole
-                .push(member.displayName.replace(/ *\"[^)]*\" */g, ""))
-                .replaceAll("  ", " ");
+              namesrole.push(
+                member.displayName
+                  .replace(/ *\"[^)]*\" */g, "")
+                  .replaceAll("  ", " ")
+              );
             }
           }
         }
@@ -70,12 +72,12 @@ module.exports = {
           value: namesmsg.length + "/" + memberCount,
         })
         .addFields({
-          name: "Anwesend",
-          value: namesmsg.join("\n"),
-        })
-        .addFields({
           name: "Abwesend",
           value: namesabwesend.join("\n"),
+        })
+        .addFields({
+          name: "Anwesend",
+          value: namesmsg.join("\n"),
         })
         .setThumbnail(interaction.guild.iconURL())
         .setTimestamp()
