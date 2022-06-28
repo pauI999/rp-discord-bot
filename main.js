@@ -2268,7 +2268,10 @@ client.on("messageCreate", async (message) => {
         setTimeout(() => message.delete().catch((error) => {}), config.timeout);
       });
     } else {
-      msg = "Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:";
+      msg =
+        "<@" +
+        message.member +
+        ">, Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:";
       if (config.anwesenheitchannel !== "0") {
         msg =
           msg +
