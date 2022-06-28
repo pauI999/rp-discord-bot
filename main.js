@@ -2186,7 +2186,9 @@ client.on("messageCreate", async (message) => {
       functions.isLeaderschaft(message.member) ||
       functions.isFamilienrat(message.member)
     ) {
-      msg = "Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:";
+      msg =
+        message.member +
+        ", Hilfe [**() → Notwendige Angabe, <> → Optionale Angabe**]:";
       if (config.anwesenheitchannel !== "0") {
         msg =
           msg +
