@@ -2315,7 +2315,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
       reaction.message.delete().catch((error) => {});
     } else if (functions.isFamilienrat(member)) {
       reaction.message.delete().catch((error) => {});
-    } else if (reaction.message.content.includes(member)) {
+    } else if (reaction.message.content.includes(member.id)) {
       reaction.message.delete().catch((error) => {});
     }
   }
