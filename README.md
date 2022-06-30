@@ -26,6 +26,7 @@
   "logchannel": "0",
   "bildchannel": "0",
   "leavechannel": "0",
+  "leavepicture": "https://i.ibb.co/Q6WH8ZM/f-rdiebrigada.png",
   "backstep": "0",
   "waffen": {
     "spezi": "3750000",

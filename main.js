@@ -467,7 +467,7 @@ client.on("guildMemberRemove", async (member) => {
     const embed = new Discord.MessageEmbed()
       .setColor(config.colorhex)
       .setTitle(`Tschüss ${member.displayName}, fick dein Vater!`)
-      .setImage("https://i.ibb.co/Q6WH8ZM/f-rdiebrigada.png")
+      .setImage(config.leavepicture)
       .setTimestamp()
       .setFooter({ text: member.guild.name });
     let channel = member.guild.channels.cache.get(config.leavechannel);
