@@ -2327,6 +2327,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
   if (reaction.emoji.name === "✅") {
     if (reaction.message.partial) await reaction.message.fetch();
     if (reaction.message.channel.id === config.routechannel) {
+      if (config.preisg == 0) return;
       const member = reaction.message.mentions.users.first();
       if (member !== undefined) {
         const member2 = reaction.message.guild.members.cache.get(user.id);
