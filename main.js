@@ -583,7 +583,9 @@ client.on("messageCreate", async (message) => {
       message.channel.send("Find‘s ic heraus! :slight_smile:");
     } else if (command === "waffe") {
       message.channel.send(
-        "Bitte an <#969787601294864384> halten! <:marceloThumbsUp:969784438596718632>"
+        "Bitte an <#" +
+          config.waffenchannel +
+          "> halten! <:marceloThumbsUp:969784438596718632>"
       );
     } else if (command === "schwein") {
       message.channel.send("Du Schwein! :pig:");
