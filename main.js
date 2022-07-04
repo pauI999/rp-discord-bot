@@ -575,6 +575,53 @@ client.on("messageCreate", async (message) => {
       }
     }
   }
+  // Frakkassechannel Check
+  if (message.channel.id === config.kassechannel) {
+    if (message.content.includes("$") && message.content.includes("%")) {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
+        let msgsplit = message.content.split(" ");
+        let amount = 0;
+        msgsplit.forEach((s) => {
+          if (s.includes("$")) {
+            amount = s.replaceAll(".", "").replace("$", "");
+          }
+        });
+        amount = parseInt(amount);
+        let prozent = 0;
+        msgsplit.forEach((s) => {
+          if (s.includes("%")) {
+            prozent = s.replace("%", "");
+          }
+        });
+        prozent = parseInt(prozent);
+        message.channel.messages.fetch({ limit: 2 }).then((ms) => {
+          ms.forEach(async (m) => {
+            if (m.partial) await m.fetch();
+            if (m.id !== message.id) {
+              let msplit = m.content.split(" ");
+              let currentamount = msplit[msplit.length - 1];
+              currentamount = currentamount
+                .replaceAll(".", "")
+                .replace("$", "");
+              currentamount = parseInt(currentamount);
+              let plus = amount * 0.92 - amount * (1 - prozent / 100);
+              plus = parseInt(plus);
+              const d = new Date();
+              message.channel.send(
+                `+${functions.addDots(plus)}$ Geldwäsche ${d.getDate()}.${
+                  d.getMonth() + 1
+                }\n\nFrakkasse: ${functions.addDots(currentamount + plus)}$`
+              );
+              message.delete().catch((error) => {});
+            }
+          });
+        });
+      }
+    }
+  }
   // !a Commands
   if (message.content.startsWith("!a")) {
     const args = message.content.slice(3).split(/ +/);
