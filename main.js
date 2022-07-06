@@ -622,6 +622,7 @@ client.on("messageCreate", async (message) => {
                   currentamount + plus
                 )}$`
               );
+              message.author.send(amount * (1 - prozent / 100));
               message.delete().catch((error) => {});
             }
           });
