@@ -614,11 +614,13 @@ client.on("messageCreate", async (message) => {
               plus = parseInt(plus);
               const d = new Date();
               message.channel.send(
-                `+${functions.addDots(plus)}$ Geldwäsche ${(d.getDate().length =
-                  1 ? "0" + d.getDate() : d.getDate())}.${(d.getMonth().length =
-                  1
-                    ? "0" + (d.getMonth() + 1)
-                    : d.getMonth() + 1)}\n\nFrakkasse: ${functions.addDots(
+                `+${functions.addDots(plus)}$ Geldwäsche von <@${
+                  message.member.id
+                }> ${(d.getDate().length = 1
+                  ? "0" + d.getDate()
+                  : d.getDate())}.${(d.getMonth().length = 1
+                  ? "0" + (d.getMonth() + 1)
+                  : d.getMonth() + 1)}\n\nFrakkasse: ${functions.addDots(
                   currentamount + plus
                 )}$`
               );
