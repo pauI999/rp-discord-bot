@@ -610,7 +610,7 @@ client.on("messageCreate", async (message) => {
                 .replaceAll(".", "")
                 .replace("$", "");
               currentamount = parseInt(currentamount);
-              let plus = amount * 0.92 - amount * (1 - prozent / 100);
+              let plus = amount * 0.91 - amount * (1 - prozent / 100);
               plus = parseInt(plus);
               const d = new Date();
               message.channel.send(
