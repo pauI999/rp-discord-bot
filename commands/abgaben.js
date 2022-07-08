@@ -10,7 +10,7 @@ function toggleAbgaben(interaction, user, kw) {
     kassechannel = interaction.guild.channels.cache.get(config.kassechannel);
   }
   let done = false;
-  channel.messages.fetch({ limit: 6 }).then((messages) => {
+  channel.messages.fetch().then((messages) => {
     messages.each((smessage) => {
       if (smessage.content.includes(`**${kw}**`)) {
         if (smessage.content.includes(user)) {
@@ -54,7 +54,7 @@ function toggleAbgaben(interaction, user, kw) {
                     });
                   }
                 }
-                logEmbed(
+                functions.logEmbed(
                   interaction.member,
                   `Abgaben ${kw} von <@${user}> entgegengenommen`,
                   `+ ${config.abgabenstring}`
@@ -112,6 +112,7 @@ function toggleAbgaben(interaction, user, kw) {
               "Fehler: Das Mitglied muss diese Woche noch keine Abgaben zahlen!",
             ephemeral: true,
           });
+          return;
         }
       }
     });
