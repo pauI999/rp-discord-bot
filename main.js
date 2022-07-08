@@ -2579,7 +2579,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
             .split(".")
             .join("");
           if (config.kassechannel !== "0") {
-            if (config.waffenp && !config.waffenp) {
+            if (!config.waffenp) {
               let kassechannel = reaction.message.guild.channels.cache.get(
                 config.kassechannel
               );
@@ -2650,7 +2650,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
             amount = amount + element * waffen.get(index);
           });
           if (config.kassechannel !== "0") {
-            if (config.waffenp && !config.waffenp) {
+            if (!config.waffenp) {
               let kassechannel = reaction.message.guild.channels.cache.get(
                 config.kassechannel
               );
