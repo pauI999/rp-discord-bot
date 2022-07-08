@@ -171,7 +171,7 @@ module.exports = {
             );
           }
         } else {
-          console.log(interaction.options);
+          console.log(interaction);
           functions.toggleAbgaben2(
             interaction,
             interaction.options.getUser("familienmitglied").id,
