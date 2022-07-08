@@ -171,7 +171,7 @@ module.exports = {
             );
           }
         } else {
-          console.log(interaction.options.getUser("target"));
+          console.log(interaction.options.getUser("target").id);
           functions.toggleAbgaben2(
             interaction,
             interaction.options.getUser("target").id,
