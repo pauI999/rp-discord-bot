@@ -677,15 +677,10 @@ client.on("messageCreate", async (message) => {
                   currentamount + plus
                 )}$`
               );
-              if (
-                message.member.roles.cache.some(
-                  (role) => role.id === "994093511475474452"
-                )
-              ) {
-                message.author.send(
-                  `${functions.addDots(amount * (1 - prozent / 100))}$`
-                );
-              }
+              message.author.send(
+                `${functions.addDots(amount * (1 - prozent / 100))}$`
+              );
+
               message.delete().catch((error) => {});
             }
           });
