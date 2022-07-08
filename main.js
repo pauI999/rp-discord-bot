@@ -703,17 +703,11 @@ client.on("messageCreate", async (message) => {
     if (command === "ic") {
       message.channel.send("Find‘s ic heraus! :slight_smile:");
     } else if (command === "waffe") {
-      message.channel.send(
-        "Bitte an <#" +
-          config.waffenchannel +
-          "> halten! <:marceloThumbsUp:969784438596718632>"
-      );
+      message.channel.send("Bitte an <#" + config.waffenchannel + "> halten!");
     } else if (command === "schwein") {
       message.channel.send("Du Schwein! :pig:");
     } else if (command === "chat") {
-      message.channel.send(
-        "Chattet woanders ihr ... <:marceloThumbsDown:969785051325812796>"
-      );
+      message.channel.send("Chattet woanders ihr ...");
     } else if (command === "perry") {
       message.channel.send(
         "https://medal.tv/games/gta-v/clips/oZ8g0JmIq8bqb/d1337vgz7jTB?invite=cr-MSxGU3EsNTI3NDU0MTAs"
@@ -2466,11 +2460,32 @@ client.on("messageReactionAdd", async (reaction, user) => {
             let kassechannel = reaction.message.guild.channels.cache.get(
               config.kassechannel
             );
-            kassechannel.send(
-              `> - ${functions.addDots(amount)}$ ${
-                config.droge
-              } Verkauf Rückzahlung - ${member}`
-            );
+            kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
+              ms.forEach(async (m) => {
+                if (m.partial) await m.fetch();
+                let msplit = m.content.split(" ");
+                let currentamount = msplit[msplit.length - 1];
+                if (currentamount.includes("$")) {
+                  currentamount = currentamount
+                    .replaceAll(".", "")
+                    .replace("$", "");
+                  currentamount = parseInt(currentamount);
+                  kassechannel.send(
+                    `- ${functions.addDots(amount)}$ ${
+                      config.droge
+                    } Verkauf Rückzahlung - ${member}\n\n> Frakkasse: ${addDots(
+                      currentamount - parseInt(amount)
+                    )}$`
+                  );
+                } else {
+                  kassechannel.send(
+                    `- ${functions.addDots(amount)}$ ${
+                      config.droge
+                    } Verkauf Rückzahlung - ${member}`
+                  );
+                }
+              });
+            });
           }
           functions.logEmbed(
             member2,
@@ -2503,11 +2518,33 @@ client.on("messageReactionAdd", async (reaction, user) => {
             let kassechannel = reaction.message.guild.channels.cache.get(
               config.kassechannel
             );
-            kassechannel.send(
-              `> + ${functions.addDots(parseInt(amount) * config.preisavv)}$ ${
-                config.droge
-              } Verkauf`
-            );
+            kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
+              ms.forEach(async (m) => {
+                if (m.partial) await m.fetch();
+                let msplit = m.content.split(" ");
+                let currentamount = msplit[msplit.length - 1];
+                if (currentamount.includes("$")) {
+                  currentamount = currentamount
+                    .replaceAll(".", "")
+                    .replace("$", "");
+                  currentamount = parseInt(currentamount);
+                  kassechannel.send(
+                    `+ ${functions.addDots(
+                      parseInt(amount) * config.preisavv
+                    )}$ ${config.droge} Verkauf\n\n> Frakkasse: ${addDots(
+                      currentamount -
+                        parseInt(parseInt(amount) * config.preisavv)
+                    )}$`
+                  );
+                } else {
+                  kassechannel.send(
+                    `+ ${functions.addDots(
+                      parseInt(amount) * config.preisavv
+                    )}$ ${config.droge} Verkauf`
+                  );
+                }
+              });
+            });
           }
           functions.logEmbed(
             member2,
@@ -2543,9 +2580,30 @@ client.on("messageReactionAdd", async (reaction, user) => {
             let kassechannel = reaction.message.guild.channels.cache.get(
               config.kassechannel
             );
-            kassechannel.send(
-              `> - ${functions.addDots(parseInt(preis))}$ Waffenbestellung`
-            );
+            kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
+              ms.forEach(async (m) => {
+                if (m.partial) await m.fetch();
+                let msplit = m.content.split(" ");
+                let currentamount = msplit[msplit.length - 1];
+                if (currentamount.includes("$")) {
+                  currentamount = currentamount
+                    .replaceAll(".", "")
+                    .replace("$", "");
+                  currentamount = parseInt(currentamount);
+                  kassechannel.send(
+                    `- ${functions.addDots(
+                      parseInt(preis)
+                    )}$ Waffenbestellung\n\n> Frakkasse: ${addDots(
+                      currentamount - parseInt(preis)
+                    )}$`
+                  );
+                } else {
+                  kassechannel.send(
+                    `- ${functions.addDots(parseInt(preis))}$ Waffenbestellung`
+                  );
+                }
+              });
+            });
           }
           functions.logEmbed(
             member2,
@@ -2589,9 +2647,32 @@ client.on("messageReactionAdd", async (reaction, user) => {
             let kassechannel = reaction.message.guild.channels.cache.get(
               config.kassechannel
             );
-            kassechannel.send(
-              `> + ${functions.addDots(amount)}$ Waffenbestellung - ${member}`
-            );
+            kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
+              ms.forEach(async (m) => {
+                if (m.partial) await m.fetch();
+                let msplit = m.content.split(" ");
+                let currentamount = msplit[msplit.length - 1];
+                if (currentamount.includes("$")) {
+                  currentamount = currentamount
+                    .replaceAll(".", "")
+                    .replace("$", "");
+                  currentamount = parseInt(currentamount);
+                  kassechannel.send(
+                    `+ ${functions.addDots(
+                      amount
+                    )}$ Waffenbestellung - ${member}\n\n> Frakkasse: ${addDots(
+                      currentamount + parseInt(amount)
+                    )}$`
+                  );
+                } else {
+                  kassechannel.send(
+                    `+ ${functions.addDots(
+                      amount
+                    )}$ Waffenbestellung - ${member}`
+                  );
+                }
+              });
+            });
           }
           functions.logEmbed(
             member2,

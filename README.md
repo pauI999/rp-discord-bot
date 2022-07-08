@@ -23,6 +23,7 @@
   "abgabenstring": "1$",
   "kassechannel": "0",
   "waffenchannel": "0",
+  "waffenp": false,
   "logchannel": "0",
   "bildchannel": "0",
   "leavechannel": "0",
@@ -54,7 +55,7 @@
     "koe": "275000",
     "brechstange": "275000"
   },
-  "categories": "»",
-  "waffenleaderschaft": true,
+  "categories": "",
+  "waffenleaderschaft": false,
   "waffenstring": "'adw', 'spezi', 'gusenberg', 'ak', 'kampfsmg', 'kompakt', 'pdw', 'smg', '50er', 'schwere', 'sns', 'flasche', 'rohrzange', 'hammer', 'schlagring', 'golfschlaeger', 'klappmesser', 'kampfaxt', 'machete', 'messer', 'axt', 'dolch', 'koe', 'brechstange'"
 }
