@@ -29,7 +29,6 @@ module.exports = {
         functions.isLeaderschaft(interaction.member) ||
         functions.isFamilienrat(interaction.member)
       ) {
-        console.log(interaction.options);
         interaction.reply({
           content: `✅ <#${config.routechannel}>`,
           ephemeral: true,

@@ -24,7 +24,6 @@ module.exports = {
         ephemeral: true,
       });
     } else {
-      console.log(interaction);
       if (
         functions.isLeaderschaft(interaction.member) ||
         functions.isFamilienrat(interaction.member)
