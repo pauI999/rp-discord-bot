@@ -166,14 +166,14 @@ module.exports = {
           } else {
             toggleAbgaben(
               interaction,
-              interaction.options.getUser("familienmitglied"),
+              interaction.options.getUser("familienmitglied").id,
               interaction.options.getNumber("kalenderwoche")
             );
           }
         } else {
           toggleAbgaben(
             interaction,
-            interaction.options.getUser("familienmitglied"),
+            interaction.options.getUser("familienmitglied").id,
             functions.getWeekNumber(new Date())
           );
         }
