@@ -137,7 +137,7 @@ module.exports = {
     .setDescription("Ändere den Abgabenstatus eines Familienmitgliedes!")
     .addUserOption((option) =>
       option
-        .setName("familienmitglied")
+        .setName("target")
         .setDescription("Familienmitglied")
         .setRequired(true)
     )
@@ -166,15 +166,15 @@ module.exports = {
           } else {
             functions.toggleAbgaben2(
               interaction,
-              interaction.options.getUser("familienmitglied").id,
+              interaction.options.getUser("target").id,
               interaction.options.getNumber("kalenderwoche")
             );
           }
         } else {
-          console.log(interaction.options.getUser("familienmitglied"));
+          console.log(interaction.options.getUser("target"));
           functions.toggleAbgaben2(
             interaction,
-            interaction.options.getUser("familienmitglied").id,
+            interaction.options.getUser("target").id,
             functions.getWeekNumber(new Date())
           );
         }
