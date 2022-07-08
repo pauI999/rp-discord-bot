@@ -24,11 +24,11 @@ module.exports = {
         ephemeral: true,
       });
     } else {
+      console.log(interaction);
       if (
         functions.isLeaderschaft(interaction.member) ||
         functions.isFamilienrat(interaction.member)
       ) {
-        console.log(interaction);
         if (interaction.options.getNumber("kalenderwoche") !== null) {
           if (interaction.options.getNumber("kalenderwoche") == 0) {
             interaction.reply({
