@@ -164,18 +164,19 @@ module.exports = {
               ephemeral: true,
             });
           } else {
-            toggleAbgaben(
+            functions.toggleAbgaben2(
               interaction,
               interaction.options.getUser("familienmitglied").id,
               interaction.options.getNumber("kalenderwoche")
             );
           }
         } else {
-          toggleAbgaben(
+          functions.toggleAbgaben2(
             interaction,
             interaction.options.getUser("familienmitglied").id,
             functions.getWeekNumber(new Date())
           );
+          console.log(interaction.options.getUser("familienmitglied").id);
         }
       } else {
         interaction.reply({
