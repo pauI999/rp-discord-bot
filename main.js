@@ -2473,7 +2473,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
                   kassechannel.send(
                     `- ${functions.addDots(amount)}$ ${
                       config.droge
-                    } Verkauf Rückzahlung - ${member}\n\n> Frakkasse: ${addDots(
+                    } Verkauf Rückzahlung - ${member}\n\n> Frakkasse: ${functions.addDots(
                       currentamount - parseInt(amount)
                     )}$`
                   );
@@ -2531,7 +2531,9 @@ client.on("messageReactionAdd", async (reaction, user) => {
                   kassechannel.send(
                     `+ ${functions.addDots(
                       parseInt(amount) * config.preisavv
-                    )}$ ${config.droge} Verkauf\n\n> Frakkasse: ${addDots(
+                    )}$ ${
+                      config.droge
+                    } Verkauf\n\n> Frakkasse: ${functions.addDots(
                       currentamount -
                         parseInt(parseInt(amount) * config.preisavv)
                     )}$`
@@ -2577,33 +2579,37 @@ client.on("messageReactionAdd", async (reaction, user) => {
             .split(".")
             .join("");
           if (config.kassechannel !== "0") {
-            let kassechannel = reaction.message.guild.channels.cache.get(
-              config.kassechannel
-            );
-            kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
-              ms.forEach(async (m) => {
-                if (m.partial) await m.fetch();
-                let msplit = m.content.split(" ");
-                let currentamount = msplit[msplit.length - 1];
-                if (currentamount.includes("$")) {
-                  currentamount = currentamount
-                    .replaceAll(".", "")
-                    .replace("$", "");
-                  currentamount = parseInt(currentamount);
-                  kassechannel.send(
-                    `- ${functions.addDots(
-                      parseInt(preis)
-                    )}$ Waffenbestellung\n\n> Frakkasse: ${addDots(
-                      currentamount - parseInt(preis)
-                    )}$`
-                  );
-                } else {
-                  kassechannel.send(
-                    `- ${functions.addDots(parseInt(preis))}$ Waffenbestellung`
-                  );
-                }
+            if (config.waffenp && !config.waffenp) {
+              let kassechannel = reaction.message.guild.channels.cache.get(
+                config.kassechannel
+              );
+              kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
+                ms.forEach(async (m) => {
+                  if (m.partial) await m.fetch();
+                  let msplit = m.content.split(" ");
+                  let currentamount = msplit[msplit.length - 1];
+                  if (currentamount.includes("$")) {
+                    currentamount = currentamount
+                      .replaceAll(".", "")
+                      .replace("$", "");
+                    currentamount = parseInt(currentamount);
+                    kassechannel.send(
+                      `- ${functions.addDots(
+                        parseInt(preis)
+                      )}$ Waffenbestellung\n\n> Frakkasse: ${functions.addDots(
+                        currentamount - parseInt(preis)
+                      )}$`
+                    );
+                  } else {
+                    kassechannel.send(
+                      `- ${functions.addDots(
+                        parseInt(preis)
+                      )}$ Waffenbestellung`
+                    );
+                  }
+                });
               });
-            });
+            }
           }
           functions.logEmbed(
             member2,
@@ -2644,35 +2650,37 @@ client.on("messageReactionAdd", async (reaction, user) => {
             amount = amount + element * waffen.get(index);
           });
           if (config.kassechannel !== "0") {
-            let kassechannel = reaction.message.guild.channels.cache.get(
-              config.kassechannel
-            );
-            kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
-              ms.forEach(async (m) => {
-                if (m.partial) await m.fetch();
-                let msplit = m.content.split(" ");
-                let currentamount = msplit[msplit.length - 1];
-                if (currentamount.includes("$")) {
-                  currentamount = currentamount
-                    .replaceAll(".", "")
-                    .replace("$", "");
-                  currentamount = parseInt(currentamount);
-                  kassechannel.send(
-                    `+ ${functions.addDots(
-                      amount
-                    )}$ Waffenbestellung - ${member}\n\n> Frakkasse: ${addDots(
-                      currentamount + parseInt(amount)
-                    )}$`
-                  );
-                } else {
-                  kassechannel.send(
-                    `+ ${functions.addDots(
-                      amount
-                    )}$ Waffenbestellung - ${member}`
-                  );
-                }
+            if (config.waffenp && !config.waffenp) {
+              let kassechannel = reaction.message.guild.channels.cache.get(
+                config.kassechannel
+              );
+              kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
+                ms.forEach(async (m) => {
+                  if (m.partial) await m.fetch();
+                  let msplit = m.content.split(" ");
+                  let currentamount = msplit[msplit.length - 1];
+                  if (currentamount.includes("$")) {
+                    currentamount = currentamount
+                      .replaceAll(".", "")
+                      .replace("$", "");
+                    currentamount = parseInt(currentamount);
+                    kassechannel.send(
+                      `+ ${functions.addDots(
+                        amount
+                      )}$ Waffenbestellung - ${member}\n\n> Frakkasse: ${functions.addDots(
+                        currentamount + parseInt(amount)
+                      )}$`
+                    );
+                  } else {
+                    kassechannel.send(
+                      `+ ${functions.addDots(
+                        amount
+                      )}$ Waffenbestellung - ${member}`
+                    );
+                  }
+                });
               });
-            });
+            }
           }
           functions.logEmbed(
             member2,
