@@ -632,10 +632,7 @@ client.on("messageCreate", async (message) => {
     }
   }
   // Frakkassechannel Check
-  if (
-    message.channel.id === config.kassechannel ||
-    message.channel.id === "981820995235094530"
-  ) {
+  if (message.channel.id === config.kassechannel) {
     if (message.content.includes("$") && message.content.includes("%")) {
       if (
         functions.isLeaderschaft(message.member) ||
