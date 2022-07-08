@@ -22,9 +22,37 @@ function toggleAbgaben(interaction, user, kw) {
               if (teil.includes(":x:")) {
                 teil = ` - <@${user.id}> - :white_check_mark:`;
                 if (config.kassechannel !== "0") {
-                  kassechannel.send(
-                    `> + ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
-                  );
+                  if (config.abgabenchannel.includes("$")) {
+                    kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
+                      ms.forEach(async (m) => {
+                        if (m.partial) await m.fetch();
+                        let msplit = m.content.split(" ");
+                        let currentamount = msplit[msplit.length - 1];
+                        if (currentamount.includes("$")) {
+                          currentamount = currentamount
+                            .replaceAll(".", "")
+                            .replace("$", "");
+                          currentamount = parseInt(currentamount);
+                          kassechannel.send(
+                            `+ ${config.abgabenstring}$ Abgaben ${kw} - <@${
+                              user.id
+                            }> \n\n> Frakkasse: ${functions.addDots(
+                              currentamount +
+                                parseInt(
+                                  config.abgabenstring
+                                    .replaceAll(".", "")
+                                    .replace("$", "")
+                                )
+                            )}$`
+                          );
+                        } else {
+                          kassechannel.send(
+                            `+ ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                          );
+                        }
+                      });
+                    });
+                  }
                 }
                 logEmbed(
                   interaction.member,
@@ -34,9 +62,37 @@ function toggleAbgaben(interaction, user, kw) {
               } else {
                 teil = ` - <@${user.id}> - :x:`;
                 if (config.kassechannel !== "0") {
-                  kassechannel.send(
-                    `> - ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
-                  );
+                  if (config.abgabenchannel.includes("$")) {
+                    kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
+                      ms.forEach(async (m) => {
+                        if (m.partial) await m.fetch();
+                        let msplit = m.content.split(" ");
+                        let currentamount = msplit[msplit.length - 1];
+                        if (currentamount.includes("$")) {
+                          currentamount = currentamount
+                            .replaceAll(".", "")
+                            .replace("$", "");
+                          currentamount = parseInt(currentamount);
+                          kassechannel.send(
+                            `- ${config.abgabenstring}$ Abgaben ${kw} - <@${
+                              user.id
+                            }> \n\n> Frakkasse: ${functions.addDots(
+                              currentamount -
+                                parseInt(
+                                  config.abgabenstring
+                                    .replaceAll(".", "")
+                                    .replace("$", "")
+                                )
+                            )}$`
+                          );
+                        } else {
+                          kassechannel.send(
+                            `- ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                          );
+                        }
+                      });
+                    });
+                  }
                 }
                 logEmbed(
                   interaction.member,
