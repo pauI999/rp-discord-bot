@@ -28,7 +28,7 @@ module.exports = {
         functions.isLeaderschaft(interaction.member) ||
         functions.isFamilienrat(interaction.member)
       ) {
-        console.log(interaction);
+        console.log(await interaction);
         if (interaction.options.getNumber("kalenderwoche") !== null) {
           if (interaction.options.getNumber("kalenderwoche") == 0) {
             interaction.reply({
