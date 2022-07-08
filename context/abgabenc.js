@@ -2,7 +2,7 @@ const config = require("../config.json");
 const functions = require("../functions/functions");
 
 module.exports = {
-  data: { name: "abgaben", type: 2 },
+  data: { name: "abgabenc", type: 2 },
   async execute(interaction) {
     if (config.abgabenchannel == "0") {
       interaction.reply({
