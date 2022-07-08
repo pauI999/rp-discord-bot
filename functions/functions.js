@@ -155,7 +155,7 @@ function toggleAbgaben2(interaction, user, kw) {
                           kassechannel.send(
                             `+ ${
                               config.abgabenstring
-                            } Abgaben ${kw} - <@${user}> \n\n> Frakkasse: ${functions.addDots(
+                            } Abgaben ${kw} - <@${user}> \n\n> Frakkasse: ${addDots(
                               currentamount +
                                 parseInt(
                                   config.abgabenstring
@@ -173,7 +173,7 @@ function toggleAbgaben2(interaction, user, kw) {
                     });
                   }
                 }
-                functions.logEmbed(
+                logEmbed(
                   interaction.member,
                   `Abgaben ${kw} von <@${user}> entgegengenommen`,
                   `+ ${config.abgabenstring}`
@@ -195,7 +195,7 @@ function toggleAbgaben2(interaction, user, kw) {
                           kassechannel.send(
                             `- ${
                               config.abgabenstring
-                            } Abgaben ${kw} - <@${user}> \n\n> Frakkasse: ${functions.addDots(
+                            } Abgaben ${kw} - <@${user}> \n\n> Frakkasse: ${addDots(
                               currentamount -
                                 parseInt(
                                   config.abgabenstring
@@ -213,7 +213,7 @@ function toggleAbgaben2(interaction, user, kw) {
                     });
                   }
                 }
-                functions.logEmbed(
+                logEmbed(
                   interaction.member,
                   `Abgaben ${kw} an <@${user}> zurückgegeben`,
                   `- ${config.abgabenstring}`
