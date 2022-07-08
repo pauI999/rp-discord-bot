@@ -101,7 +101,7 @@ function toggleAbgaben(message, user, kw) {
                             .replace("$", "");
                           currentamount = parseInt(currentamount);
                           kassechannel.send(
-                            `+ ${config.abgabenstring}$ Abgaben ${kw} - <@${
+                            `+ ${config.abgabenstring} Abgaben ${kw} - <@${
                               user.id
                             }> \n\n> Frakkasse: ${functions.addDots(
                               currentamount +
