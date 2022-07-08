@@ -176,7 +176,7 @@ module.exports = {
             interaction.options.getUser("familienmitglied").id,
             functions.getWeekNumber(new Date())
           );
-          console.log(interaction.options.getUser("familienmitglied").id);
+          console.log(interaction.options.getUser("familienmitglied"));
         }
       } else {
         interaction.reply({
