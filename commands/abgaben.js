@@ -171,12 +171,12 @@ module.exports = {
             );
           }
         } else {
+          console.log(interaction.options.getUser("familienmitglied"));
           functions.toggleAbgaben2(
             interaction,
             interaction.options.getUser("familienmitglied").id,
             functions.getWeekNumber(new Date())
           );
-          console.log(interaction.options.getUser("familienmitglied"));
         }
       } else {
         interaction.reply({
