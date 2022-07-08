@@ -659,29 +659,47 @@ client.on("messageCreate", async (message) => {
             if (m.id !== message.id) {
               let msplit = m.content.split(" ");
               let currentamount = msplit[msplit.length - 1];
-              currentamount = currentamount
-                .replaceAll(".", "")
-                .replace("$", "");
-              currentamount = parseInt(currentamount);
-              let plus = amount * 0.9 - amount * (1 - prozent / 100);
-              plus = parseInt(plus);
-              const d = new Date();
-              message.channel.send(
-                `+${functions.addDots(plus)}$ Geldwäsche von <@${
-                  message.member.id
-                }> ${(d.getDate().length = 1
-                  ? "0" + d.getDate()
-                  : d.getDate())}.${(d.getMonth().length = 1
-                  ? "0" + (d.getMonth() + 1)
-                  : d.getMonth() + 1)}\n\n> Frakkasse: ${functions.addDots(
-                  currentamount + plus
-                )}$`
-              );
-              message.author.send(
-                `${functions.addDots(amount * (1 - prozent / 100))}$`
-              );
-
-              message.delete().catch((error) => {});
+              if (currentamount.includes("$")) {
+                currentamount = currentamount
+                  .replaceAll(".", "")
+                  .replace("$", "");
+                currentamount = parseInt(currentamount);
+                let plus = amount * 0.9 - amount * (1 - prozent / 100);
+                plus = parseInt(plus);
+                const d = new Date();
+                message.channel.send(
+                  `+${functions.addDots(plus)}$ Geldwäsche von <@${
+                    message.member.id
+                  }> ${(d.getDate().length = 1
+                    ? "0" + d.getDate()
+                    : d.getDate())}.${(d.getMonth().length = 1
+                    ? "0" + (d.getMonth() + 1)
+                    : d.getMonth() + 1)}\n\n> Frakkasse: ${functions.addDots(
+                    currentamount + plus
+                  )}$`
+                );
+                message.author.send(
+                  `${functions.addDots(amount * (1 - prozent / 100))}$`
+                );
+                message.delete().catch((error) => {});
+              } else {
+                let plus = amount * 0.9 - amount * (1 - prozent / 100);
+                plus = parseInt(plus);
+                const d = new Date();
+                message.channel.send(
+                  `+${functions.addDots(plus)}$ Geldwäsche von <@${
+                    message.member.id
+                  }> ${(d.getDate().length = 1
+                    ? "0" + d.getDate()
+                    : d.getDate())}.${(d.getMonth().length = 1
+                    ? "0" + (d.getMonth() + 1)
+                    : d.getMonth() + 1)}`
+                );
+                message.author.send(
+                  `${functions.addDots(amount * (1 - prozent / 100))}$`
+                );
+                message.delete().catch((error) => {});
+              }
             }
           });
         });
@@ -695,7 +713,7 @@ client.on("messageCreate", async (message) => {
     if (command === "ic") {
       message.channel.send("Find‘s ic heraus! :slight_smile:");
     } else if (command === "waffe") {
-      message.channel.send("Bitte an <#" + config.waffenchannel + "> halten!");
+      message.channel.send("Bitte an das Waffen-Tutorial halten!");
     } else if (command === "schwein") {
       message.channel.send("Du Schwein! :pig:");
     } else if (command === "chat") {
