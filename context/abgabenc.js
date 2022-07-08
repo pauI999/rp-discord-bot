@@ -19,7 +19,6 @@ module.exports = {
           interaction.targetId,
           functions.getWeekNumber(new Date())
         );
-        console.log(interaction.targetId);
       } else {
         interaction.reply({
           content: "Fehler: Du hast nicht genug Rechte!",
