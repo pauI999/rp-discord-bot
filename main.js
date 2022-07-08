@@ -89,7 +89,7 @@ function toggleAbgaben(message, user, kw) {
               if (teil.includes(":x:")) {
                 teil = ` - <@${user.id}> - :white_check_mark:`;
                 if (config.kassechannel !== "0") {
-                  if (config.abgabenchannel.includes("$")) {
+                  if (config.abgabenstring.includes("$")) {
                     kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
                       ms.forEach(async (m) => {
                         if (m.partial) await m.fetch();
@@ -129,7 +129,7 @@ function toggleAbgaben(message, user, kw) {
               } else {
                 teil = ` - <@${user.id}> - :x:`;
                 if (config.kassechannel !== "0") {
-                  if (config.abgabenchannel.includes("$")) {
+                  if (config.abgabenstring.includes("$")) {
                     kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
                       ms.forEach(async (m) => {
                         if (m.partial) await m.fetch();
