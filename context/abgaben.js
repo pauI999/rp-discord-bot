@@ -33,9 +33,9 @@ function toggleAbgaben(interaction, user, kw) {
                             .replace("$", "");
                           currentamount = parseInt(currentamount);
                           kassechannel.send(
-                            `+ ${config.abgabenstring} Abgaben ${kw} - <@${
-                              user.id
-                            }> \n\n> Frakkasse: ${functions.addDots(
+                            `+ ${
+                              config.abgabenstring
+                            } Abgaben ${kw} - <@${user}> \n\n> Frakkasse: ${functions.addDots(
                               currentamount +
                                 parseInt(
                                   config.abgabenstring
@@ -46,7 +46,7 @@ function toggleAbgaben(interaction, user, kw) {
                           );
                         } else {
                           kassechannel.send(
-                            `+ ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                            `+ ${config.abgabenstring} Abgaben ${kw} - <@${user}>`
                           );
                         }
                       });
@@ -73,9 +73,9 @@ function toggleAbgaben(interaction, user, kw) {
                             .replace("$", "");
                           currentamount = parseInt(currentamount);
                           kassechannel.send(
-                            `- ${config.abgabenstring} Abgaben ${kw} - <@${
-                              user.id
-                            }> \n\n> Frakkasse: ${functions.addDots(
+                            `- ${
+                              config.abgabenstring
+                            } Abgaben ${kw} - <@${user}> \n\n> Frakkasse: ${functions.addDots(
                               currentamount -
                                 parseInt(
                                   config.abgabenstring
@@ -86,7 +86,7 @@ function toggleAbgaben(interaction, user, kw) {
                           );
                         } else {
                           kassechannel.send(
-                            `- ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                            `- ${config.abgabenstring} Abgaben ${kw} - <@${user}>`
                           );
                         }
                       });

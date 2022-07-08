@@ -13,14 +13,14 @@ function toggleAbgaben(interaction, user, kw) {
   channel.messages.fetch({ limit: 6 }).then((messages) => {
     messages.each((smessage) => {
       if (smessage.content.includes(`**${kw}**`)) {
-        if (smessage.content.includes(user.id)) {
+        if (smessage.content.includes(user)) {
           done = true;
           let teile = smessage.content.split("\n");
           let teileneu = [];
           teile.forEach((teil) => {
-            if (teil.includes(user.id)) {
+            if (teil.includes(user)) {
               if (teil.includes(":x:")) {
-                teil = ` - <@${user.id}> - :white_check_mark:`;
+                teil = ` - <@${user}> - :white_check_mark:`;
                 if (config.kassechannel !== "0") {
                   if (config.abgabenstring.includes("$")) {
                     kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
@@ -34,9 +34,9 @@ function toggleAbgaben(interaction, user, kw) {
                             .replace("$", "");
                           currentamount = parseInt(currentamount);
                           kassechannel.send(
-                            `+ ${config.abgabenstring} Abgaben ${kw} - <@${
-                              user.id
-                            }> \n\n> Frakkasse: ${functions.addDots(
+                            `+ ${
+                              config.abgabenstring
+                            } Abgaben ${kw} - <@${user}> \n\n> Frakkasse: ${functions.addDots(
                               currentamount +
                                 parseInt(
                                   config.abgabenstring
@@ -47,7 +47,7 @@ function toggleAbgaben(interaction, user, kw) {
                           );
                         } else {
                           kassechannel.send(
-                            `+ ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                            `+ ${config.abgabenstring} Abgaben ${kw} - <@${user}>`
                           );
                         }
                       });
@@ -56,11 +56,11 @@ function toggleAbgaben(interaction, user, kw) {
                 }
                 logEmbed(
                   interaction.member,
-                  `Abgaben ${kw} von <@${user.id}> entgegengenommen`,
+                  `Abgaben ${kw} von <@${user}> entgegengenommen`,
                   `+ ${config.abgabenstring}`
                 );
               } else {
-                teil = ` - <@${user.id}> - :x:`;
+                teil = ` - <@${user}> - :x:`;
                 if (config.kassechannel !== "0") {
                   if (config.abgabenstring.includes("$")) {
                     kassechannel.messages.fetch({ limit: 1 }).then((ms) => {
@@ -74,9 +74,9 @@ function toggleAbgaben(interaction, user, kw) {
                             .replace("$", "");
                           currentamount = parseInt(currentamount);
                           kassechannel.send(
-                            `- ${config.abgabenstring} Abgaben ${kw} - <@${
-                              user.id
-                            }> \n\n> Frakkasse: ${functions.addDots(
+                            `- ${
+                              config.abgabenstring
+                            } Abgaben ${kw} - <@${user}> \n\n> Frakkasse: ${functions.addDots(
                               currentamount -
                                 parseInt(
                                   config.abgabenstring
@@ -87,7 +87,7 @@ function toggleAbgaben(interaction, user, kw) {
                           );
                         } else {
                           kassechannel.send(
-                            `- ${config.abgabenstring} Abgaben ${kw} - <@${user.id}>`
+                            `- ${config.abgabenstring} Abgaben ${kw} - <@${user}>`
                           );
                         }
                       });
@@ -96,7 +96,7 @@ function toggleAbgaben(interaction, user, kw) {
                 }
                 logEmbed(
                   interaction.member,
-                  `Abgaben ${kw} an <@${user.id}> zurückgegeben`,
+                  `Abgaben ${kw} an <@${user}> zurückgegeben`,
                   `- ${config.abgabenstring}`
                 );
               }
