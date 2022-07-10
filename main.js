@@ -695,9 +695,9 @@ client.on("messageCreate", async (message) => {
                     ? "0" + (d.getMonth() + 1)
                     : d.getMonth() + 1)}`
                 );
-                message.author.send(
-                  `${functions.addDots(amount * (1 - prozent / 100))}$`
-                );
+                message.author
+                  .send(`${functions.addDots(amount * (1 - prozent / 100))}$`)
+                  .catch((error) => {});
                 message.delete().catch((error) => {});
               }
             }
