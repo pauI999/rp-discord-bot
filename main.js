@@ -686,6 +686,8 @@ client.on("messageCreate", async (message) => {
                 let plus = amount - amount * (1 - prozent / 100);
                 plus = parseInt(plus);
                 const d = new Date();
+                console.log(d.getDate().length);
+                console.log(d.getMonth().length);
                 message.channel.send(
                   `+${functions.addDots(plus)}$ Geldwäsche von <@${
                     message.member.id
