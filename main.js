@@ -670,13 +670,15 @@ client.on("messageCreate", async (message) => {
                 message.channel.send(
                   `+${functions.addDots(plus)}$ Geldwäsche von <@${
                     message.member.id
-                  }> ${(d.getDate().toString().length = 1
-                    ? "0" + d.getDate()
-                    : d.getDate())}.${(d.getMonth().toString().length = 1
-                    ? "0" + (d.getMonth() + 1)
-                    : d.getMonth() + 1)}\n\n> Frakkasse: ${functions.addDots(
-                    currentamount + plus
-                  )}$`
+                  }> ${
+                    d.getDate().toString().length == 1
+                      ? "0" + d.getDate()
+                      : d.getDate()
+                  }.${
+                    d.getMonth().toString().length == 1
+                      ? "0" + (d.getMonth() + 1)
+                      : d.getMonth() + 1
+                  }\n\n> Frakkasse: ${functions.addDots(currentamount + plus)}$`
                 );
                 message.author.send(
                   `${functions.addDots(amount * (1 - prozent / 100))}$`
@@ -689,11 +691,15 @@ client.on("messageCreate", async (message) => {
                 message.channel.send(
                   `+${functions.addDots(plus)}$ Geldwäsche von <@${
                     message.member.id
-                  }> ${(d.getDate().toString().length = 1
-                    ? "0" + d.getDate()
-                    : d.getDate())}.${(d.getMonth().toString().length = 1
-                    ? "0" + (d.getMonth() + 1)
-                    : d.getMonth() + 1)}`
+                  }> ${
+                    d.getDate().toString().length == 1
+                      ? "0" + d.getDate()
+                      : d.getDate()
+                  }.${
+                    d.getMonth().toString().length == 1
+                      ? "0" + (d.getMonth() + 1)
+                      : d.getMonth() + 1
+                  }`
                 );
                 message.author
                   .send(`${functions.addDots(amount * (1 - prozent / 100))}$`)
