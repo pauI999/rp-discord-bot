@@ -689,11 +689,13 @@ client.on("messageCreate", async (message) => {
                 message.channel.send(
                   `+${functions.addDots(plus)}$ Geldwäsche von <@${
                     message.member.id
-                  }> ${(d.getDate().length = 1
-                    ? "0" + d.getDate()
-                    : d.getDate())}.${(d.getMonth().length = 1
-                    ? "0" + (d.getMonth() + 1)
-                    : d.getMonth() + 1)}`
+                  }> ${
+                    d.getDate().length <= 1 ? "0" + d.getDate() : d.getDate()
+                  }.${
+                    d.getMonth().length <= 1
+                      ? "0" + (d.getMonth() + 1)
+                      : d.getMonth() + 1
+                  }`
                 );
                 message.author
                   .send(`${functions.addDots(amount * (1 - prozent / 100))}$`)
