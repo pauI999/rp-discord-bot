@@ -40,13 +40,13 @@ function cleanAbgaben(message, kw) {
             if (
               guildMember.roles.cache.some((role) => role.id === config.familie)
             ) {
-              if (
+              /*if (
                 !guildMember.roles.cache.some(
                   (role) => role.id === config.leaderschaft
                 )
-              ) {
-                teileneu.push(teil);
-              }
+              ) {*/
+              teileneu.push(teil);
+              //}
             }
           }
         });
@@ -104,15 +104,15 @@ function fillAbgaben(message, kw) {
           })
           .each((member) => {
             if (member.roles.cache.some((role) => role.id === config.familie)) {
-              if (
+              /*if (
                 !member.roles.cache.some(
                   (role) => role.id === config.leaderschaft
                 )
-              ) {
-                if (!alreadyin.includes(member.id)) {
-                  teileneu.push(` - ${member} - :x:`);
-                }
+              ) {*/
+              if (!alreadyin.includes(member.id)) {
+                teileneu.push(` - ${member} - :x:`);
               }
+              //     }
             }
           });
         smessage.edit(teileneu.join("\n"));

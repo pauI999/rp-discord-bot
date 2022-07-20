@@ -27,11 +27,11 @@ function sendAbgabenMessage(message, channel) {
     })
     .each((member) => {
       if (member.roles.cache.some((role) => role.id === config.familie)) {
-        if (
+        /*if (
           !member.roles.cache.some((role) => role.id === config.leaderschaft)
-        ) {
-          string.push(`\n - ${member} - :x:`);
-        }
+        ) {*/
+        string.push(`\n - ${member} - :x:`);
+        //}
       }
     });
   channel.send(string.join(""));
