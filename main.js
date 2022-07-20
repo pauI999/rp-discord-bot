@@ -38,7 +38,7 @@ function cleanAbgaben(message, kw) {
           let guildMember = message.guild.members.cache.get(memberID);
           if (guildMember) {
             if (
-              guildMember.roles.cache.some((role) => role.id === config.famile)
+              guildMember.roles.cache.some((role) => role.id === config.familie)
             ) {
               if (
                 !guildMember.roles.cache.some(
@@ -50,6 +50,71 @@ function cleanAbgaben(message, kw) {
             }
           }
         });
+        smessage.edit(teileneu.join("\n"));
+      }
+    });
+    if (!done) {
+      message
+        .reply(
+          "Fehler: Die Nachricht für diese Kalenderwoche fehlt noch, oder liegt zu weit in der Vergangenheit!"
+        )
+        .then((msg) => {
+          setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+    setTimeout(() => message.delete().catch((error) => {}), config.timeout);
+  });
+}
+
+// Clean Abgabenliste Funktion
+function fillAbgaben(message, kw) {
+  let channel = message.guild.channels.cache.get(config.abgabenchannel);
+  let done = false;
+  channel.messages.fetch({ limit: 20 }).then((messages) => {
+    messages.each((smessage) => {
+      if (smessage.content.includes(`**${kw}**`)) {
+        done = true;
+        let alreadyin = [];
+        let teile = smessage.content.split("\n");
+        let teileneu = [];
+        teileneu.push(teile[0]);
+        teile.shift();
+        teile.forEach((teil) => {
+          var memberID = teil
+            .split(" ")[2]
+            .replace("<", "")
+            .replace("@", "")
+            .replace("!", "")
+            .replace(">", "");
+          alreadyin.push(memberID);
+          teileneu.push(teil);
+        });
+        message.guild.members.cache
+          .sort(function (a, b) {
+            if (a.displayName < b.displayName) {
+              return 1;
+            }
+            if (a.displayName > b.displayName) {
+              return -1;
+            }
+            return 0;
+          })
+          .each((member) => {
+            if (member.roles.cache.some((role) => role.id === config.familie)) {
+              if (
+                !member.roles.cache.some(
+                  (role) => role.id === config.leaderschaft
+                )
+              ) {
+                if (!alreadyin.includes(member.id)) {
+                  teileneu.push(` - ${member} - :x:`);
+                }
+              }
+            }
+          });
         smessage.edit(teileneu.join("\n"));
       }
     });
@@ -1922,6 +1987,60 @@ client.on("messageCreate", async (message) => {
             console.error(error);
           });
       }
+    } // Clean Abgaben Command
+    else if (command === "fillabgaben") {
+      if (
+        functions.isLeaderschaft(message.member) ||
+        functions.isFamilienrat(message.member)
+      ) {
+        if (args.length === 1) {
+          if (functions.isNumeric(args[0])) {
+            fillAbgaben(message, args[0]);
+          } else {
+            message
+              .reply('Syntax: "' + config.prefix + 'fillabgaben (KW)"!')
+              .then((msg) => {
+                setTimeout(
+                  () => msg.delete().catch((error) => {}),
+                  config.timeout
+                );
+                setTimeout(
+                  () => message.delete().catch((error) => {}),
+                  config.timeout
+                );
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }
+        } else {
+          message
+            .reply('Syntax: "' + config.prefix + 'fillabgaben (KW)"!')
+            .then((msg) => {
+              setTimeout(
+                () => msg.delete().catch((error) => {}),
+                config.timeout
+              );
+              setTimeout(
+                () => message.delete().catch((error) => {}),
+                config.timeout
+              );
+            });
+        }
+      } else {
+        message
+          .reply(`Fehler: Du hast nicht genug Rechte!`)
+          .then((msg) => {
+            setTimeout(() => msg.delete().catch((error) => {}), config.timeout);
+            setTimeout(
+              () => message.delete().catch((error) => {}),
+              config.timeout
+            );
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     }
   }
   // Aussetzen
@@ -2367,7 +2486,10 @@ client.on("messageCreate", async (message) => {
           'abgabenmessage" um die Abgabennachricht für die Woche zu schicken' +
           '\n - "' +
           config.prefix +
-          'cleanabgaben (KW)" um die Abgabennachricht für angegebene Woche zu "bereinigen"';
+          'cleanabgaben (KW)" um die Abgabennachricht für angegebene Woche zu "bereinigen"' +
+          '\n - "' +
+          config.prefix +
+          'fillabgaben (KW)" um die Abgabennachricht für angegebene Woche aufzufüllen';
       }
       if (config.waffenchannel !== "0") {
         msg =
